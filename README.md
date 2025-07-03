@@ -5,7 +5,7 @@
 ## 🚀 Getting Started
 
 ### **Recommended: Use Our Codespace**
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/andreagriffiths11/gitvision-andrea)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/gh-event-demos/gitvision-andrea)
 
 For the best workshop experience:
 - Click the Codespace badge above 
