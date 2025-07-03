@@ -6,7 +6,7 @@
 
 > **Recommended: Open this repository in the provided Codespace!**
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Event-Demos/gitvision-workshop)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/GH-Event-Demos/gitvision-workshop)
 
 For the best experience, use the Codespace linked above or provided by your instructor. This ensures:
 - All dependencies are pre-installed and ready to go
