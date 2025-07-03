@@ -4,11 +4,11 @@
 
 ## 🚀 Getting Started
 
-### **Recommended: Use Instructor's Codespace**
+### **Recommended: Use Our Codespace**
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/andreagriffiths11/gitvision-andrea)
 
 For the best workshop experience:
-- Click the Codespace badge above (uses instructor's minutes)
+- Click the Codespace badge above 
 - All dependencies pre-installed and ready to go
 - No setup required—just start coding!
 
