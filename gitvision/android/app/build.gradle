@@ -1,0 +1,8 @@
+android {
+    defaultConfig {
+        manifestPlaceholders = [
+            redirectSchemeName: "gitvision",
+            redirectHostName: "auth-callback"
+        ]
+    }
+}
