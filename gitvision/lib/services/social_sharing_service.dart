@@ -61,7 +61,7 @@ class SocialSharingService {
       }
 
       // Launch URL for social platforms
-      if (shareUrl != null && await canLaunchUrl(Uri.parse(shareUrl))) {
+      if (await canLaunchUrl(Uri.parse(shareUrl))) {
         await launchUrl(Uri.parse(shareUrl),
             mode: LaunchMode.externalApplication);
         return true;

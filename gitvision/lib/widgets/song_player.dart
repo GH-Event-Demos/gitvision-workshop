@@ -11,10 +11,10 @@ class SongPlayer extends StatefulWidget {
   final PlaylistGenerator playlistGenerator;
 
   const SongPlayer({
-    Key? key,
+    super.key,
     required this.song,
     required this.playlistGenerator,
-  }) : super(key: key);
+  });
 
   @override
   State<SongPlayer> createState() => _SongPlayerState();
@@ -203,7 +203,7 @@ class _SongPlayerState extends State<SongPlayer> {
                         width: 80,
                         height: 80,
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.surfaceVariant,
+                          color: theme.colorScheme.surfaceContainerHighest,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(
@@ -317,7 +317,7 @@ class _SongPlayerState extends State<SongPlayer> {
                 },
                 thumbColor: theme.colorScheme.primary,
                 progressBarColor: theme.colorScheme.primary,
-                baseBarColor: theme.colorScheme.surfaceVariant,
+                baseBarColor: theme.colorScheme.surfaceContainerHighest,
                 bufferedBarColor: theme.colorScheme.primary.withValues(alpha: 0.3),
               ),
             ],

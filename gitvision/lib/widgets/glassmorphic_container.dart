@@ -10,13 +10,13 @@ class GlassmorphicContainer extends StatelessWidget {
   final double opacity;
 
   const GlassmorphicContainer({
-    Key? key,
+    super.key,
     required this.child,
     this.borderRadius = 24.0,
     this.blur = 10.0,
     this.color = Colors.white,
     this.opacity = 0.1,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

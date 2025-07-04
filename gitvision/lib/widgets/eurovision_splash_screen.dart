@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../main.dart';
 
 class EurovisionSplashScreen extends StatefulWidget {
   final VoidCallback onComplete;

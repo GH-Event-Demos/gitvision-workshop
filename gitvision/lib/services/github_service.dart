@@ -72,7 +72,7 @@ class GitHubService {
 
       // Workshop: Demonstrate HTTP status code handling
       print('📊 [GitHub API] Response status: ${response.statusCode}');
-      print('📊 [GitHub API] Response body preview: ${response.body.length > 100 ? response.body.substring(0, 100) + "..." : response.body}');
+      print('📊 [GitHub API] Response body preview: ${response.body.length > 100 ? "${response.body.substring(0, 100)}..." : response.body}');
       
       if (response.statusCode == 403) {
         // Debug: print('⚠️ [GitHub API] Rate limit exceeded');

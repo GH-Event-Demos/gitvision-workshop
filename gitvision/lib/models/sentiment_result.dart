@@ -1,5 +1,4 @@
 // Data structure for sentiment analysis results with Eurovision integration
-import 'eurovision_song.dart';
 import 'coding_mood.dart';
 import 'sentiment_analysis.dart';
 
