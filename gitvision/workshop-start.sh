@@ -6,6 +6,10 @@
 echo "🇪🇺 Welcome to GitVision Workshop! 🎵"
 echo "=================================="
 
+# Change to the correct directory
+cd "$(dirname "$0")"
+echo "📁 Working directory: $(pwd)"
+
 # Check if Flutter is installed
 if ! command -v flutter &> /dev/null; then
     echo "❌ Flutter is not installed. Please install Flutter first:"

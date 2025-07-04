@@ -21,7 +21,7 @@ class SentimentAnalyzer {
     // Count occurrences of mood-indicating keywords
     for (final message in commitMessages) {
       final lowerMessage = message.toLowerCase();
-
+      
       CodingMoodData.keywords.forEach((mood, keywords) {
         for (final keyword in keywords) {
           if (lowerMessage.contains(keyword)) {
@@ -69,7 +69,7 @@ class SentimentAnalyzer {
     // Count keyword occurrences
     for (final message in commitMessages) {
       final lowerMessage = message.toLowerCase();
-
+      
       CodingMoodData.keywords.forEach((mood, keywords) {
         for (final keyword in keywords) {
           if (lowerMessage.contains(keyword)) {
@@ -93,16 +93,15 @@ class SentimentAnalyzer {
 
     // Calculate confidence
     final totalWords = commitMessages.join(' ').split(' ').length;
-    final confidence =
-        maxCount == 0 ? 0.3 : min(0.9, (maxCount / totalWords) * 10);
+    final confidence = maxCount == 0 ? 0.3 : min(0.9, (maxCount / totalWords) * 10);
 
     return SentimentResult(
       mood: dominantMood,
       confidence: confidence,
       keywords: foundKeywords.take(5).toList(),
-      reasoning: maxCount > 0
-          ? 'Found $maxCount keywords matching ${dominantMood.name}'
-          : 'No strong patterns detected, defaulting to ${dominantMood.name}',
+      reasoning: maxCount > 0 
+        ? 'Found $maxCount keywords matching ${dominantMood.name}'
+        : 'No strong patterns detected, defaulting to ${dominantMood.name}',
       analysis: SentimentAnalysis(
         totalCommits: commitMessages.length,
         moodCounts: moodCounts,
