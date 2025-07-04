@@ -67,10 +67,10 @@ class _GitHubAnalyzerScreenState extends State<GitHubAnalyzerScreen> {
   Future<void> _fetchGitHubCommits(String username) async {
     // Workshop TODO: Implement real GitHub API call
     // This is a placeholder for Phase 1 starting point
-    
+
     // Simulate API call delay
     await Future.delayed(const Duration(seconds: 2));
-    
+
     // Mock data for workshop starting point
     setState(() {
       _commitMessages = [
@@ -85,7 +85,7 @@ class _GitHubAnalyzerScreenState extends State<GitHubAnalyzerScreen> {
 
   Widget _buildCommitsList() {
     if (_commitMessages.isEmpty) return const SizedBox.shrink();
-    
+
     return Expanded(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,7 +102,8 @@ class _GitHubAnalyzerScreenState extends State<GitHubAnalyzerScreen> {
               itemCount: _commitMessages.length,
               itemBuilder: (context, index) {
                 return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                   child: ListTile(
                     leading: const Icon(Icons.commit),
                     title: Text(_commitMessages[index]),
@@ -153,20 +154,20 @@ class _GitHubAnalyzerScreenState extends State<GitHubAnalyzerScreen> {
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _isLoading ? null : _analyzeGitHubProfile,
-                  child: _isLoading 
-                    ? const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                          SizedBox(width: 8),
-                          Text('Analyzing...'),
-                        ],
-                      )
-                    : const Text('Analyze GitHub Profile'),
+                  child: _isLoading
+                      ? const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                            SizedBox(width: 8),
+                            Text('Analyzing...'),
+                          ],
+                        )
+                      : const Text('Analyze GitHub Profile'),
                 ),
                 if (_errorMessage != null)
                   Padding(

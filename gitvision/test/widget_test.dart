@@ -11,20 +11,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gitvision/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  testWidgets('GitVision app smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(const GitVisionApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Verify that our app has the Eurovision title
+    expect(find.text('🎵 GitVision - Eurovision Edition'), findsOneWidget);
+    expect(find.text('🇪🇺'), findsOneWidget);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    // Verify that the GitHub username input field exists
+    expect(find.byType(TextField), findsOneWidget);
+    expect(find.text('GitHub Username'), findsOneWidget);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Verify that the analyze button exists
+    expect(find.text('🎵 Analyze GitHub Profile'), findsOneWidget);
   });
 }

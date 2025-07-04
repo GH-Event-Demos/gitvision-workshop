@@ -20,51 +20,153 @@ This guide provides effective prompting strategies for GitHub Copilot to help ge
 
 ## Phase 2: GitHub Integration
 
-### Outcome: GitHub API Authentication
+### Outcome: GitHub API Authentication & Data Fetching
 
-**Effective Prompts:**
-1. "Implement a Flutter service to fetch GitHub commit history for a username using the GitHub API with proper error handling and rate limit management."
-2. "Write a Dart function that extracts relevant information from GitHub commit API responses, including message, date, and author."
-3. "Create a pagination mechanism for GitHub API to handle repositories with many commits, implementing the Link header parsing."
+**Highly Effective Prompts:**
 
-### Outcome: Repository Analysis
+1. **Context-Rich API Implementation:**
 
-**Effective Prompts:**
-1. "Create a repository analyzer in Dart that can process GitHub API responses and extract meaningful commit patterns."
-2. "Implement a function to filter out merge commits and automated messages from GitHub commit history."
-3. "Build a data structure to organize commit messages by author, date, and content for analysis."
+```dart
+// In GitVision Eurovision app, implement GitHub API integration that:
+// - Fetches recent commit events from https://api.github.com/users/{username}/events
+// - Extracts commit messages from PushEvent payloads
+// - Handles 403 (rate limit), 404 (user not found), network timeouts
+// - Uses Eurovision-themed error messages like "Eurovision break time! GitHub API rate limit exceeded"
+// - Limits to 10 commits for performance
+// - Includes proper User-Agent header for GitHub API compliance
+```
 
-### Outcome: Commit Data Extraction
+2. **Error-First Development:**
 
-**Effective Prompts:**
-1. "Create a sentiment analyzer in Dart that maps coding-related keywords to Eurovision moods (productive, debugging, experimental, breakthrough, reflective)."
-2. "Implement a scoring algorithm that evaluates commit messages to detect the dominant coding mood."
-3. "Write a function that extracts keywords from commit messages and classifies them into Eurovision-themed sentiment categories."
+```dart
+// Create comprehensive GitHub API error handling with Eurovision theming:
+// Handle specific scenarios:
+// - 403: "Eurovision break time! GitHub API rate limit exceeded. Even Eurovision has intermissions - try again in an hour!"
+// - 404: "This GitHub user is more elusive than a Eurovision winner prediction! Please check the username."
+// - Network: "Eurovision needs the internet! Please check your connection and try again."
+// - Timeout: "Eurovision timeout! Even the best performances need good timing. Please try again!"
+```
 
-### Outcome: Error Handling
+### Outcome: Commit Sentiment Analysis
 
-**Effective Prompts:**
-1. "Implement comprehensive error handling for GitHub API in Flutter, including rate limits, network failures, and authentication issues."
-2. "Create user-friendly error messages for GitHub API failures with Eurovision-themed messaging."
-3. "Write exponential backoff retry logic for GitHub API rate limit handling."
+**Highly Effective Prompts:**
+
+1. **Eurovision-Themed Mood Detection:**
+
+```dart
+// Create Eurovision-themed sentiment analyzer that maps commit keywords to coding moods:
+// Map these patterns:
+// - 'productive' keywords (add, implement, create, feature, update, build) → "Productive Flow - Like Eurovision upbeat anthems! (Euphoria vibes)"
+// - 'debugging' keywords (fix, bug, issue, error, crash, debug) → "Debugging Intensity - Like Eurovision power ballads! (Rise Like a Phoenix)"
+// - 'creative' keywords (design, style, ui, animation, theme, experiment) → "Creative Experimental - Like unique Eurovision entries! (Epic Sax Guy energy)"
+// - 'victory' keywords (release, deploy, complete, finish, milestone, ship) → "Victory Breakthrough - Like Eurovision winners! (Waterloo moment)"
+// - 'reflective' keywords (cleanup, organize, document, improve, optimize) → "Reflective Cleanup - Like emotional Eurovision songs! (Arcade feels)"
+// Use case-insensitive matching and count keyword occurrences to determine dominant mood
+```
+
+### Outcome: UI State Management
+
+**Highly Effective Prompts:**
+
+1. **Flutter State Management with Loading:**
+
+```dart
+// Create StatefulWidget for GitHub analysis with these exact state variables:
+// - TextEditingController _usernameController
+// - bool _isLoading (for API calls)
+// - String? _errorMessage (for user-friendly errors)
+// - List<String> _commitMessages (for extracted commits)
+// - String? _detectedMood (for sentiment result)
+// Include loading UI with "Analyzing Eurovision vibes..." message
+// Show commit list with Eurovision mood card when analysis completes
+```
 
 ## Phase 3: AI Eurovision Magic
 
-### Outcome: Models API Implementation
+### Outcome: GitHub Models API Integration
 
-**Effective Prompts:**
-1. "Create a Dart service to call GitHub Models API with proper authentication and error handling."
-2. "Implement an AI prompt generator that creates effective prompts for Eurovision song recommendations based on commit sentiment."
-3. "Write a function to parse and validate AI responses containing Eurovision song suggestions."
+**Highly Effective Prompts:**
 
-### Outcome: Song Matching
+1. **Complete AI Service Implementation:**
 
-**Effective Prompts:**
-1. "Create a EurovisionSong data model in Dart with fields for title, artist, country, year, and reasoning with proper validation."
-2. "Implement validation logic for Eurovision songs ensuring years are between 1956-2025 and country names are valid."
-3. "Add country flag emoji mapping for Eurovision countries, handling historical country name changes appropriately."
+```dart
+// Implement GitHub Models API integration in AIPlaylistService for GitVision with:
+// - Secure authentication using token from ApiConfig
+// - POST request to https://models.github.ai/inference/chat/completions
+// - JSON structure with model: "github-starcoder2-7b-2024-05-20"
+// - Proper headers and timeout handling (15 seconds)
+// - Eurovision-specific error handling like "Eurovision judge is taking a break!"
+// - Comprehensive response parsing with fallback mechanism
+```
 
-### Outcome: Playlist Generation
+2. **Structured AI Prompt Engineering:**
+
+```dart
+// Create a Eurovision-specific prompt for GitHub Models API that:
+// - Uses this exact format: "Based on coding mood: '{mood}', suggest 5 Eurovision songs matching this developer's vibe."
+// - Requests specific JSON format: [{"title": "...", "artist": "...", "country": "...", "year": ..., "reasoning": "..."}]
+// - Includes helpful context about Eurovision's cultural importance
+// - Provides mood keywords to guide song selection
+// - Ensures years are valid (1956-2025) and countries are actual Eurovision participants
+// - Has fallback Eurovision songs per mood category when AI fails
+```
+
+### Outcome: Eurovision Song Modeling & Validation
+
+**Highly Effective Prompts:**
+
+1. **Complete EurovisionSong Model:**
+
+```dart
+// Create a comprehensive EurovisionSong model class that:
+// - Has fields for title, artist, country, year (int), and reasoning
+// - Includes JSON serialization/deserialization
+// - Implements proper toString() and equality methods
+// - Contains validation for years (1956-2025)
+// - Validates against official Eurovision country list
+// - Has factory constructor to parse AI-generated responses
+// - Includes toString() method showing "{title} by {artist} ({country}, {year})"
+```
+
+2. **Eurovision Cultural Validation:**
+
+```dart
+// Implement Eurovision cultural validation logic that:
+// - Maintains a list of valid Eurovision countries from 1956-2025
+// - Handles historical country changes (e.g., Yugoslavia → Serbia, USSR → Russia)
+// - Maps country names to flag emojis (🇸🇪 🇺🇦 🇮🇹)
+// - Includes validation method isValidEurovisionEntry that checks year and country
+// - Provides fallback mechanism for incorrect country names
+// - Respects cultural sensitivities around contested territories
+```
+
+### Outcome: AI Response Parsing & Error Handling
+
+**Highly Effective Prompts:**
+
+1. **Robust JSON Parsing:**
+
+```dart
+// Create a resilient Eurovision AI response parser that:
+// - Safely extracts JSON data from AI completions API response
+// - Handles malformed JSON with clear error messages
+// - Validates each song field before creating EurovisionSong objects
+// - Filters out invalid entries (wrong years, countries)
+// - Limits to 5-8 songs maximum for performance
+// - Returns a clearly typed List<EurovisionSong> with null safety
+```
+
+2. **Comprehensive Fallback System:**
+
+```dart
+// Implement Eurovision fallback system with:
+// - Pre-defined Eurovision songs for each mood category
+// - At least 3 songs per mood from different decades/countries
+// - Clear indication when falling back to predefined songs
+// - Eurovision-themed error messages like "The AI jury is deliberating!"
+// - Graceful degradation that never breaks the user experience
+// - Logging for failed AI requests to improve future prompts
+```
 
 **Effective Prompts:**
 1. "Write a JSON parser for converting GitHub Models API responses into EurovisionSong objects with error handling."
@@ -117,15 +219,23 @@ This guide provides effective prompting strategies for GitHub Copilot to help ge
 2. "Create a team-based commit analyzer that combines multiple developers' coding patterns."
 3. "Build a user preferences system for favorite Eurovision eras and countries."
 
-## Advanced Prompt Engineering Techniques
+## Advanced Prompt Engineering Techniques for GitVision
 
-### 1. Context-Aware Prompting
-**Strategy**: Provide context about the entire system to get more coherent code.
+### 1. Context-Rich System Understanding
 
+**Strategy**: Provide complete context about the GitVision app architecture.
+
+```dart
+// In GitVision's Flutter Eurovision app (which connects GitHub commit analysis with 
+// AI Eurovision song recommendations and Spotify playback):
+// 
+// Implement a robust error handling system that:
+// - Uses Eurovision-themed error messages ("Even Eurovision has technical difficulties!")
+// - Provides specific feedback for each API failure scenario
+// - Implements exponential backoff for rate limits
+// - Includes offline mode with cached Eurovision recommendations
+// - Maintains proper Flutter state management during error recovery
 ```
-// In the context of a Flutter Eurovision app that analyzes GitHub commits
-// and generates playlists using AI, create a robust error handling system
-// that maintains the Eurovision theme while providing actionable feedback.
 ```
 
 ### 2. Multi-Step Prompting
@@ -293,30 +403,75 @@ Create a Dart data class [ModelName] that:
 7. **Consider Edge Cases**: Explicitly mention error scenarios and boundary conditions.
 8. **Maintain Context**: Reference existing code structure and naming conventions.
 
-## Example Complete Prompt
+## GitVision Optimized Prompt Template
 
+The most effective GitVision prompt style based on actual implementation experience:
+
+```dart
+// For GitVision Eurovision Flutter app, implement a {feature} that:
+//
+// 1. Integration requirements:
+//    - Connects to {API/service} with proper authentication
+//    - Handles {specific error cases} with Eurovision-themed messages
+//    - Follows Flutter best practices for async operations
+//
+// 2. Data handling requirements:
+//    - Processes {input data format} into {output data structure}
+//    - Validates data against Eurovision rules (years 1956-2025, valid countries)
+//    - Includes fallback mechanisms when data is unavailable/invalid
+//
+// 3. UI/UX requirements:
+//    - Shows loading states with Eurovision theming
+//    - Displays error feedback in user-friendly format
+//    - Maintains cultural sensitivity with accurate country references
+//
+// 4. Cultural considerations:
+//    - Maps programming concepts to Eurovision themes
+//    - Uses accurate country names and flag emojis
+//    - Respects Eurovision's diversity and inclusion values
+//
+// Code structure should follow GitVision's {architecture pattern} with
+// proper separation of concerns and testability.
 ```
-Create a Flutter service class called SpotifyService that:
-1. Implements client credentials authentication with Spotify Web API (no OAuth)
-2. Securely stores and manages access tokens
-3. Provides methods to search for Eurovision songs by title and artist
-4. Handles missing songs gracefully with appropriate user feedback
-5. Implements comprehensive error handling with Eurovision-themed messages
-6. Follows Flutter best practices for async operations
-7. Includes appropriate documentation
 
-The service should fit within our existing GitVision architecture and respect
-Eurovision cultural values with appropriate country naming.
+## Example of Highly Effective Actual Prompt
+
+This optimized prompt style has been proven to produce high-quality GitVision code:
+
+```dart
+// For GitVision Eurovision app, implement a GitHub commit sentiment analyzer that:
+//
+// 1. Data analysis requirements:
+//    - Creates a mapping of programming keywords to Eurovision moods
+//    - Maps 'productive' keywords (add, implement, create) → "Productive Flow - Like Eurovision upbeat anthems! (Euphoria vibes)"
+//    - Maps 'debugging' keywords (fix, bug, issue) → "Debugging Intensity - Like Eurovision power ballads! (Rise Like a Phoenix)"
+//    - Maps 'creative' keywords (design, style, ui) → "Creative Experimental - Like unique Eurovision entries! (Epic Sax Guy energy)"
+//    - Maps 'victory' keywords (release, deploy, complete) → "Victory Breakthrough - Like Eurovision winners! (Waterloo moment)"
+//    - Maps 'reflective' keywords (cleanup, organize, document) → "Reflective Cleanup - Like emotional Eurovision songs! (Arcade feels)"
+//
+// 2. Implementation details:
+//    - Use case-insensitive matching for better accuracy
+//    - Count keyword occurrences to determine dominant mood
+//    - Default to 'productive' mood if no clear pattern emerges
+//    - Process an entire list of commit messages as input
+//    - Return both mood category and Eurovision-themed description
+//
+// 3. Integration with app:
+//    - Callable from StatefulWidget context
+//    - Updates UI state with detected mood
+//    - Enables further processing for AI Eurovision recommendations
 ```
 
 ## Debugging Copilot Responses
 
-When Copilot generates unexpected results:
+When your GitVision prompts don't produce the expected results:
 
-1. **Refine Context**: Add more specific domain context
-2. **Break Down Tasks**: Split complex prompts into smaller steps
-3. **Add Examples**: Provide concrete input/output examples
-4. **Specify Constraints**: Be explicit about requirements and limitations
-5. **Iterate Gradually**: Build up complexity through multiple prompts
+1. **Add Eurovision Context**: Include specific references to Eurovision themes and cultural requirements
+2. **Use Code Comments Format**: Structure as `// Comment style` rather than natural language
+3. **Be Extremely Specific**: Include exact method names, parameter types, and return values
+4. **List All Edge Cases**: Explicitly mention all error scenarios that need handling
+5. **Include Sample Data**: Provide examples of input/output formats
+6. **Split Complex Features**: Break features into smaller components with clear dependencies
+7. **Specify Cultural Requirements**: Include explicit cultural sensitivity guidance
 
 
