@@ -1,0 +1,7 @@
+pluginManagement {
+    // ...existing code...
+}
+
+include ':spotify-app-remote'
+
+// ...rest of existing code...
