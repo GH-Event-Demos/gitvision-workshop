@@ -30,14 +30,8 @@
         },
         "github": {
             "type": "http",
-				"url": "https://api.githubcopilot.com/mcp/",
-				"args": [
-					"GITHUB_TOOLSETS=repos,issues,pull_requests,actions,code_security"
-                ],
-            
-        
-        
-                },
+            "url": "https://api.githubcopilot.com/mcp/"
+        },
         "Context7": {
             "command": "npx",
             "args": [
