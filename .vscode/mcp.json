@@ -1,0 +1,52 @@
+{
+    "inputs": [
+        {
+            "type": "promptString",
+            "id": "perplexity-key",
+            "description": "Perplexity API Key",
+            "password": true
+        },
+        {
+            "type": "promptString",
+            "id": "github_token", 
+            "description": "GitHub Personal Access Token",
+            "password": true
+        }
+    ],
+    "servers": {
+        "perplexity-ask": {
+            "command": "docker",
+            "args": [
+                "run",
+                "-i",
+                "--rm",
+                "-e",
+                "PERPLEXITY_API_KEY",
+                "mcp/perplexity-ask"
+            ],
+            "env": {
+                "PERPLEXITY_API_KEY": "${input:perplexity-key}"
+            }
+        },
+        "github": {
+            "type": "http",
+            "url": "https://api.githubcopilot.com/mcp/"
+        },
+        "Context7": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@upstash/context7-mcp@latest",
+                "--",
+                "xcodebuildmcp"
+            ]
+        },
+        "notify": {
+            "command": "npx",
+            "args": [
+                "-y", 
+                "mcp-notify"
+            ]
+        }
+    }
+}
