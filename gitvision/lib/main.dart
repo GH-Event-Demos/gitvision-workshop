@@ -7,6 +7,7 @@ import 'repositories/playlist_repository.dart';
 import 'services/playlist_generator.dart';
 import 'services/logging_service.dart';
 import 'services/github_service.dart';
+import 'services/spotify_service.dart';
 import 'config/api_config.dart';
 import 'screens/main_screen.dart';
 
@@ -28,10 +29,17 @@ class GitVisionApp extends StatelessWidget {
           create: (_) => LoggingService(),
         ),
         
+        Provider<SpotifyService>(
+          create: (_) => SpotifyService(
+            clientId: ApiConfig.spotifyClientId,
+            clientSecret: ApiConfig.spotifyClientSecret,
+          ),
+        ),
+        
         Provider<PlaylistGenerator>(
           create: (context) => PlaylistGenerator(
             githubToken: ApiConfig.githubToken,
-            spotifyService: null,
+            spotifyService: context.read<SpotifyService>(),
             endpoint: ApiConfig.githubModelsEndpoint,
             model: ApiConfig.aiModel,
           ),
@@ -47,7 +55,7 @@ class GitVisionApp extends StatelessWidget {
         Provider<PlaylistRepository>(
           create: (context) => PlaylistRepository(
             playlistGenerator: context.read<PlaylistGenerator>(),
-            spotifyService: null,
+            spotifyService: context.read<SpotifyService>(),
             logger: context.read<LoggingService>(),
           ),
         ),

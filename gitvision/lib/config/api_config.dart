@@ -2,6 +2,7 @@
 
 import 'dart:math';
 import 'api_tokens.dart';
+import 'package:flutter/foundation.dart';
 
 /// GitVision API Configuration that's safe to commit to version control
 /// This references the secure tokens from api_tokens.dart
@@ -29,6 +30,9 @@ class ApiConfig {
 
   // Validation
   static bool get hasValidTokens =>
+      ApiTokens.githubModelsToken.isNotEmpty && 
+      ApiTokens.spotifyClientId.isNotEmpty &&
+      ApiTokens.spotifyClientSecret.isNotEmpty;
       ApiTokens.githubModelsToken.isNotEmpty &&
       ApiTokens.spotifyClientId.isNotEmpty;
 

@@ -4,6 +4,7 @@ import '../models/coding_mood.dart';
 import '../repositories/playlist_repository.dart';
 import '../repositories/github_repository.dart';
 import '../services/logging_service.dart';
+import '../services/playlist_generator.dart';
 
 class AppStateProvider extends ChangeNotifier {
   final PlaylistRepository _playlistRepository;
@@ -44,6 +45,13 @@ class AppStateProvider extends ChangeNotifier {
 
   String? _lastError;
   String? get lastError => _lastError;
+  
+  // Audio playback state
+  int _currentlyPlayingIndex = -1;
+  int get currentlyPlayingIndex => _currentlyPlayingIndex;
+  
+  bool _isPlaying = false;
+  bool get isPlaying => _isPlaying;
 
   void updateGitHubUsername(String username) {
     _githubUsername = username.trim();
@@ -216,9 +224,75 @@ class AppStateProvider extends ChangeNotifier {
     _detectedVibe = null;
     _playlistAnalysis = null;
     _lastError = null;
+    _currentlyPlayingIndex = -1;
+    _isPlaying = false;
     notifyListeners();
   }
-}
-
-
+  
+  /// Play a song from the playlist by index
+  Future<void> playSong(int index) async {
+    if (index < 0 || index >= _playlist.length) {
+      _logger.error('Invalid song index: $index');
+      return;
+    }
+    
+    try {
+      // Stop any currently playing song
+      if (_isPlaying) {
+        await _playlistRepository.stopPlayback();
+      }
+      
+      // Play the selected song
+      final song = _playlist[index];
+      await _playlistRepository.playSong(song);
+      
+      // Update state
+      _currentlyPlayingIndex = index;
+      _isPlaying = true;
+      notifyListeners();
+    } catch (e) {
+      _logger.error('Error playing song', e);
+      _lastError = 'Could not play song: ${e.toString()}';
+      notifyListeners();
+    }
+  }
+  
+  /// Pause the currently playing song
+  Future<void> pausePlayback() async {
+    if (!_isPlaying) return;
+    
+    try {
+      await _playlistRepository.pausePlayback();
+      _isPlaying = false;
+      notifyListeners();
+    } catch (e) {
+      _logger.error('Error pausing playback', e);
+    }
+  }
+  
+  /// Resume playback of the current song
+  Future<void> resumePlayback() async {
+    if (_isPlaying || _currentlyPlayingIndex < 0) return;
+    
+    try {
+      await _playlistRepository.resumePlayback();
+      _isPlaying = true;
+      notifyListeners();
+    } catch (e) {
+      _logger.error('Error resuming playback', e);
+    }
+  }
+  
+  /// Stop the currently playing song
+  Future<void> stopPlayback() async {
+    if (_currentlyPlayingIndex < 0) return;
+    
+    try {
+      await _playlistRepository.stopPlayback();
+      _isPlaying = false;
+      notifyListeners();
+    } catch (e) {
+      _logger.error('Error stopping playback', e);
+    }
+  }
 }

@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:math';
+import 'dart:async';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import '../models/eurovision_song.dart';
 import 'spotify_service.dart';
@@ -10,6 +13,18 @@ class PlaylistGenerator {
   final SpotifyService? spotifyService;
   final String _endpoint;
   final String _model;
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  
+  // Stream subscriptions for proper disposal
+  StreamSubscription<PlayerState>? _playerStateSubscription;
+  StreamSubscription<void>? _playerCompleteSubscription;
+  
+  // Debug utility - only prints in debug mode
+  void _debugLog(String message) {
+    if (kDebugMode) {
+      print('[PlaylistGenerator] $message');
+    }
+  }
   
   PlaylistGenerator({
     required String githubToken,
@@ -18,7 +33,9 @@ class PlaylistGenerator {
     String model = "gpt-4o-mini",
   })  : _githubToken = githubToken,
         _endpoint = endpoint,
-        _model = model;
+        _model = model {
+    _initAudioPlayer();
+  }
 
   Future<Map<String, dynamic>> generatePlayablePlaylist(
       List<Map<String, dynamic>> commits) async {
@@ -32,16 +49,26 @@ class PlaylistGenerator {
       
       final playlistJson = playlist.map((song) => song.toJson()).toList();
       
+      // Enhance playlist with Spotify data if service is available
+      final enhancedPlaylist = spotifyService != null 
+          ? await _enhancePlaylist(playlistJson)
+          : playlistJson;
+      
       return {
         'mood': mood,
         'fullAnalysis': moodData['reasoning'],
-        'songs': playlistJson,
+        'songs': enhancedPlaylist,
         'generatedAt': DateTime.now().toIso8601String(),
         'stats': {
           'commitCount': commits.length,
           'earliestCommit': _getEarliestDate(commits),
           'latestCommit': _getLatestDate(commits),
-          'totalSongs': playlistJson.length,
+          'playableSongs': enhancedPlaylist.where((s) => s['isPlayable'] == true).length,
+          'totalSongs': enhancedPlaylist.length,
+        },
+        'playableLinks': {
+          'enabled': spotifyService != null,
+          'fallbacksAvailable': enhancedPlaylist.any((s) => s['isPlayable'] == true),
         }
       };
     } catch (e) {
@@ -330,6 +357,141 @@ class PlaylistGenerator {
 
     final cleaned = rawMood.toLowerCase().trim();
     return validCategories[cleaned] ?? 'Productive';
+  }
+  
+  Future<void> _initAudioPlayer() async {
+    // Configure audio player
+    await _audioPlayer.setReleaseMode(ReleaseMode.stop);
+    
+    // Set up player event listeners with proper subscription storage
+    _playerStateSubscription = _audioPlayer.onPlayerStateChanged.listen((state) {
+      _debugLog('AudioPlayer state changed to: $state');
+    });
+
+    _playerCompleteSubscription = _audioPlayer.onPlayerComplete.listen((_) {
+      _debugLog('AudioPlayer playback completed');
+    });
+
+    // Set default playback configurations
+    await _audioPlayer.setVolume(1.0);
+    await _audioPlayer.setPlaybackRate(1.0);
+  }
+
+  /// Audio playback methods
+  Future<void> playSong(Map<String, dynamic> song) async {
+    _debugLog('Attempting to play song: ${song['title']} by ${song['artist']}');
+
+    final String? previewUrl = song['preview_url'] ?? song['previewUrl'];
+    final String? webPlayerUrl = song['webPlayerUrl'] ?? song['spotifyUrl'];
+
+    if (previewUrl != null && previewUrl.isNotEmpty) {
+      _debugLog('Playing preview URL: $previewUrl');
+      await _audioPlayer.stop();
+      await _audioPlayer.setSourceUrl(previewUrl);
+      await _audioPlayer.resume();
+    } else if (webPlayerUrl != null && webPlayerUrl.isNotEmpty) {
+      _debugLog('Opening web player URL: $webPlayerUrl');
+      final url = Uri.parse(webPlayerUrl);
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      } else {
+        throw Exception('Could not launch Spotify URL');
+      }
+    } else {
+      _debugLog('ERROR: No playable URLs found for song: ${song['title']}');
+      throw Exception('No playable URLs found for this song');
+    }
+  }
+
+  Future<void> pausePlayback() async {
+    await _audioPlayer.pause();
+  }
+
+  Future<void> seek(Duration position) async {
+    await _audioPlayer.seek(position);
+  }
+
+  Future<void> stop() async {
+    await _audioPlayer.stop();
+  }
+
+  Future<void> dispose() async {
+    _playerStateSubscription?.cancel();
+    _playerCompleteSubscription?.cancel();
+    await _audioPlayer.dispose();
+  }
+  
+  /// Enhance playlist with Spotify data
+  Future<List<Map<String, dynamic>>> _enhancePlaylist(List<Map<String, dynamic>> playlist) async {
+    _debugLog('Enhancing playlist with Spotify data for ${playlist.length} songs');
+    
+    try {
+      // Build search queries for each song
+      final queries = playlist.map((song) => {
+        'title': song['title'],
+        'artist': song['artist'],
+        'year': song['year'],
+        'queries': [
+          '${song['title']} ${song['artist']}', // Exact match
+          '${song['title']} ${song['artist']} eurovision', // With eurovision
+          '${song['title']} eurovision ${song['year']}', // With year
+          song['title'], // Just the title as fallback
+        ]
+      }).toList();
+      
+      // Process each song to find Spotify data
+      final enhancedPlaylist = await Future.wait(
+        playlist.asMap().entries.map((entry) async {
+          final index = entry.key;
+          final song = entry.value;
+          final songQueries = queries[index]['queries'] as List<String>;
+          
+          // Try each query variation until we find a result with preview URL
+          for (final query in songQueries) {
+            if (spotifyService == null) break;
+            
+            final searchResults = await spotifyService!.searchTracks(query);
+            if (searchResults.isEmpty) continue;
+            
+            // Look for a result with preview URL
+            final trackWithPreview = searchResults.firstWhere(
+              (track) => track['preview_url'] != null && track['preview_url'].isNotEmpty,
+              orElse: () => searchResults.first,
+            );
+            
+            if (trackWithPreview['preview_url'] != null) {
+              // Return enhanced song
+              return {
+                ...song,
+                'preview_url': trackWithPreview['preview_url'],
+                'webPlayerUrl': trackWithPreview['webPlayerUrl'] ?? song['spotifyUrl'],
+                'imageUrl': trackWithPreview['imageUrl'] ?? song['imageUrl'] ?? 
+                         'https://via.placeholder.com/300x300.png?text=Eurovision',
+                'isPlayable': true,
+                'spotifyId': trackWithPreview['id'],
+              };
+            }
+          }
+          
+          // If no match found with preview, return original with no preview
+          return {
+            ...song,
+            'isPlayable': false,
+            'imageUrl': song['imageUrl'] ?? 'https://via.placeholder.com/300x300.png?text=Eurovision',
+          };
+        }),
+      );
+      
+      return enhancedPlaylist;
+    } catch (e) {
+      print('Error enhancing playlist: $e');
+      // Return original songs if Spotify enhancement fails
+      return playlist.map((song) => {
+        ...song,
+        'isPlayable': false,
+        'imageUrl': song['imageUrl'] ?? 'https://via.placeholder.com/300x300.png?text=Eurovision',
+      }).toList();
+    }
   }
 }
 

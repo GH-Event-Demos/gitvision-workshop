@@ -5,7 +5,9 @@ import '../providers/app_state_provider.dart';
 import '../services/theme_provider.dart';
 import '../models/coding_mood.dart';
 import '../constants/app_constants.dart';
+import '../services/playlist_generator.dart';
 import 'modern_share_widget.dart';
+import 'song_player_widget.dart';
 
 class PlaylistDisplayWidget extends StatelessWidget {
   const PlaylistDisplayWidget({super.key});
@@ -273,31 +275,69 @@ class PlaylistDisplayWidget extends StatelessWidget {
     final isPlaying = appState.currentlyPlayingIndex == index && appState.isPlaying;
     final isCurrentSong = appState.currentlyPlayingIndex == index;
 
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      leading: _buildSongImage(song, themeProvider),
-      title: Text(
-        song['title'] ?? 'Unknown Title',
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          color: isCurrentSong 
-              ? themeProvider.primaryColor 
-              : themeProvider.textColor,
-        ),
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      elevation: isCurrentSong ? 3 : 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: isCurrentSong ? BorderSide(
+          color: themeProvider.primaryColor,
+          width: 1.5,
+        ) : BorderSide.none,
       ),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
         children: [
-          Text(
-            '${song['artist'] ?? 'Unknown Artist'} • ${song['country'] ?? 'Unknown'} (${song['year'] ?? 'Unknown'})',
-            style: TextStyle(
-              color: themeProvider.textColor.withValues(alpha: 0.7),
+          // Album art and song info
+          ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            leading: _buildSongImage(song, themeProvider),
+            title: Text(
+              song['title'] ?? 'Unknown Title',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: isCurrentSong 
+                    ? themeProvider.primaryColor 
+                    : themeProvider.textColor,
+              ),
+            ),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${song['artist'] ?? 'Unknown Artist'} • ${song['country'] ?? 'Unknown'} (${song['year'] ?? 'Unknown'})',
+                  style: TextStyle(
+                    color: themeProvider.textColor.withValues(alpha: 0.7),
+                  ),
+                ),
+              ],
             ),
           ),
-          if (song['reasoning'] != null) ...[
-            const SizedBox(height: 4),
-            Text(
-              song['reasoning'],
+          
+          // Reasoning
+          if (song['reasoning'] != null && song['reasoning'].toString().isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+              child: Text(
+                song['reasoning'].toString(),
+                style: TextStyle(
+                  fontSize: 12,
+                  fontStyle: FontStyle.italic,
+                  color: themeProvider.textColor.withValues(alpha: 0.6),
+                ),
+              ),
+            ),
+          
+          // Playback controls
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SongPlayerWidget(
+              song: song,
+              playlistGenerator: Provider.of<PlaylistGenerator>(appState.context, listen: false),
+            ),
+          ),
+        ],
+      ),
+    );
               style: TextStyle(
                 fontSize: 12,
                 fontStyle: FontStyle.italic,

@@ -78,6 +78,48 @@ class PlaylistRepository {
       return song.toJson();
     }
   }
+  
+  /// Play a song using the playlist generator
+  Future<void> playSong(Map<String, dynamic> song) async {
+    try {
+      await _playlistGenerator.playSong(song);
+    } catch (error) {
+      _logger.error('Failed to play song: ${song['title']}', error);
+      throw Exception('Failed to play song: ${error.toString()}');
+    }
+  }
+  
+  /// Pause the currently playing song
+  Future<void> pausePlayback() async {
+    try {
+      await _playlistGenerator.pausePlayback();
+    } catch (error) {
+      _logger.error('Failed to pause playback', error);
+      throw Exception('Failed to pause playback: ${error.toString()}');
+    }
+  }
+  
+  /// Resume playback of the current song
+  Future<void> resumePlayback() async {
+    try {
+      // The playlist generator doesn't have a dedicated resume method,
+      // but we can use the audioPlayer's resume method
+      await _playlistGenerator._audioPlayer.resume();
+    } catch (error) {
+      _logger.error('Failed to resume playback', error);
+      throw Exception('Failed to resume playback: ${error.toString()}');
+    }
+  }
+  
+  /// Stop the currently playing song
+  Future<void> stopPlayback() async {
+    try {
+      await _playlistGenerator.stop();
+    } catch (error) {
+      _logger.error('Failed to stop playback', error);
+      throw Exception('Failed to stop playback: ${error.toString()}');
+    }
+  }
 }
 
 /// Result wrapper for playlist generation
