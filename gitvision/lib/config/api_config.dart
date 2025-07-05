@@ -25,16 +25,15 @@ class ApiConfig {
   static const String spotifyApiEndpoint = "https://api.spotify.com/v1";
 
   // Model settings - GitHub Models API compatible model
-  static const String aiModel = "gpt-4o-mini";
+  static const String aiModel = "openai/gpt-4o-mini";
   static const String aiProvider = "azureml"; // Required for GitHub Models API
 
   // Validation
-  static bool get hasValidTokens =>
-      ApiTokens.githubModelsToken.isNotEmpty && 
-      ApiTokens.spotifyClientId.isNotEmpty &&
-      ApiTokens.spotifyClientSecret.isNotEmpty;
-      ApiTokens.githubModelsToken.isNotEmpty &&
-      ApiTokens.spotifyClientId.isNotEmpty;
+  static bool get hasValidTokens {
+    return ApiTokens.githubModelsToken.isNotEmpty && 
+           ApiTokens.spotifyClientId.isNotEmpty &&
+           ApiTokens.spotifyClientSecret.isNotEmpty;
+  }
 
   // Debug information
   static void printDebugInfo() {

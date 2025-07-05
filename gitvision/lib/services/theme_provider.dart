@@ -108,7 +108,7 @@ class ThemeProvider extends ChangeNotifier {
       backgroundColor: _primaryColor,
       foregroundColor: Colors.white,
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: surfaceColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
@@ -129,7 +129,7 @@ class ThemeProvider extends ChangeNotifier {
       backgroundColor: _primaryColor,
       foregroundColor: Colors.white,
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: surfaceColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),

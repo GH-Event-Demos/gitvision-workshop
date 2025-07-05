@@ -8,6 +8,8 @@ class PlaylistRepository {
   final PlaylistGenerator _playlistGenerator;
   final SpotifyService _spotifyService;
   final LoggingService _logger;
+  
+
 
   PlaylistRepository({
     required PlaylistGenerator playlistGenerator,
@@ -20,9 +22,11 @@ class PlaylistRepository {
   /// Generate a playlist based on git commit data
   Future<PlaylistResult> generatePlaylist(List<Map<String, dynamic>> commitData) async {
     try {
+      print('🎭 [PlaylistRepository] Starting playlist generation from ${commitData.length} commits');
       _logger.debug('Generating playlist from ${commitData.length} commits');
       
       final result = await _playlistGenerator.generatePlayablePlaylist(commitData);
+      print('🎭 [PlaylistRepository] Got result from PlaylistGenerator');
       final playlist = List<Map<String, dynamic>>.from(result['songs']);
       
       _logger.logPlaylistGeneration('Generated ${playlist.length} songs from GitHub Models AI');
@@ -102,9 +106,7 @@ class PlaylistRepository {
   /// Resume playback of the current song
   Future<void> resumePlayback() async {
     try {
-      // The playlist generator doesn't have a dedicated resume method,
-      // but we can use the audioPlayer's resume method
-      await _playlistGenerator._audioPlayer.resume();
+      await _playlistGenerator.resumePlayback();
     } catch (error) {
       _logger.error('Failed to resume playback', error);
       throw Exception('Failed to resume playback: ${error.toString()}');

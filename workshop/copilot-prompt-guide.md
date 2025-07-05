@@ -91,23 +91,30 @@ This guide provides effective prompting strategies for GitHub Copilot to help ge
 
 ```dart
 // Implement GitHub Models API integration in AIPlaylistService for GitVision with:
-// - Secure authentication using token from ApiConfig
+// - Secure authentication using Bearer token from ApiConfig.githubToken
 // - POST request to https://models.github.ai/inference/chat/completions
-// - JSON structure with model: "github-starcoder2-7b-2024-05-20"
-// - Proper headers and timeout handling (15 seconds)
+// - Required headers: Accept: application/json, Authorization: Bearer {token}, 
+//   Content-Type: application/json, X-Request-Type: JSON, X-GitHub-Api-Version: 2022-11-28
+// - JSON structure with model: ApiConfig.aiModel, provider: ApiConfig.aiProvider
+// - Temperature: 0.7 for creative song selection, max_tokens: 1000
+// - Timeout handling (30 seconds) with exponential backoff retry logic
 // - Eurovision-specific error handling like "Eurovision judge is taking a break!"
 // - Comprehensive response parsing with fallback mechanism
 ```
 
-2. **Structured AI Prompt Engineering:**
+2. **Structured AI Prompt Engineering with Cultural Context:**
 
 ```dart
 // Create a Eurovision-specific prompt for GitHub Models API that:
-// - Uses this exact format: "Based on coding mood: '{mood}', suggest 5 Eurovision songs matching this developer's vibe."
+// - Includes CULTURAL CONTEXT: "Eurovision is Europe's beloved song contest celebrating 
+//   diversity, creativity, and unity through music. Each song represents a country's 
+//   cultural identity and artistic expression."
+// - Uses format: "Create a Eurovision playlist of EXACTLY 5 songs that match a {mood} coding mood"
 // - Requests specific JSON format: [{"title": "...", "artist": "...", "country": "...", "year": ..., "reasoning": "..."}]
-// - Includes helpful context about Eurovision's cultural importance
-// - Provides mood keywords to guide song selection
+// - Emphasizes cultural diversity: "Mix different decades and countries for cultural diversity"
+// - Includes regional guidance: "Nordic efficiency, Eastern European passion, Mediterranean warmth, British innovation"
 // - Ensures years are valid (1956-2025) and countries are actual Eurovision participants
+// - Maps moods to specific examples: Productive → Euphoria-Sweden 2012, Intense → Rise Like a Phoenix-Austria 2014
 // - Has fallback Eurovision songs per mood category when AI fails
 ```
 
@@ -115,63 +122,100 @@ This guide provides effective prompting strategies for GitHub Copilot to help ge
 
 **Highly Effective Prompts:**
 
-1. **Complete EurovisionSong Model:**
+1. **Complete EurovisionSong Model with Robust Validation:**
 
 ```dart
 // Create a comprehensive EurovisionSong model class that:
-// - Has fields for title, artist, country, year (int), and reasoning
-// - Includes JSON serialization/deserialization
-// - Implements proper toString() and equality methods
-// - Contains validation for years (1956-2025)
-// - Validates against official Eurovision country list
-// - Has factory constructor to parse AI-generated responses
-// - Includes toString() method showing "{title} by {artist} ({country}, {year})"
+// - Has fields for title, artist, country, year (int), reasoning, spotifyUrl, previewUrl, imageUrl
+// - Includes constructor assertions for validation: assert(year >= 1956 && year <= 2025)
+// - Validates non-empty title, artist, and country in constructor
+// - Contains static List<String> validCountries with all Eurovision participants
+// - Implements static method isValidCountry(String country) for validation
+// - Includes JSON serialization/deserialization with enhanced fromJson() factory
+// - Enhanced fromJson() validates and sanitizes data with fallback to defaultSong
+// - Implements proper toString() method showing "{title} by {artist} ({country}, {year})"
+// - Uses non-const constructor to allow validation method calls
 ```
 
-2. **Eurovision Cultural Validation:**
+2. **Eurovision Cultural Validation with Comprehensive Country List:**
 
 ```dart
 // Implement Eurovision cultural validation logic that:
-// - Maintains a list of valid Eurovision countries from 1956-2025
-// - Handles historical country changes (e.g., Yugoslavia → Serbia, USSR → Russia)
-// - Maps country names to flag emojis (🇸🇪 🇺🇦 🇮🇹)
-// - Includes validation method isValidEurovisionEntry that checks year and country
-// - Provides fallback mechanism for incorrect country names
-// - Respects cultural sensitivities around contested territories
+// - Maintains comprehensive static const List<String> validCountries including:
+//   ['Albania', 'Andorra', 'Armenia', 'Australia', 'Austria', 'Azerbaijan', 'Belarus', 
+//    'Belgium', 'Bosnia and Herzegovina', 'Bulgaria', 'Croatia', 'Cyprus', 'Czech Republic', 
+//    'Denmark', 'Estonia', 'Finland', 'France', 'Georgia', 'Germany', 'Greece', 'Hungary', 
+//    'Iceland', 'Ireland', 'Israel', 'Italy', 'Latvia', 'Lithuania', 'Luxembourg', 'Malta', 
+//    'Moldova', 'Monaco', 'Montenegro', 'Morocco', 'Netherlands', 'North Macedonia', 'Norway', 
+//    'Poland', 'Portugal', 'Romania', 'Russia', 'San Marino', 'Serbia', 'Slovakia', 'Slovenia', 
+//    'Spain', 'Sweden', 'Switzerland', 'Turkey', 'Ukraine', 'United Kingdom', 'Yugoslavia']
+// - Implements case-insensitive country validation with validCountries.any((c) => c.toLowerCase() == country.toLowerCase())
+// - Provides fallback mechanism in fromJson() that uses defaultSong.country for invalid entries
+// - Validates year range with fallback to defaultSong.year for invalid years
+// - Trims and validates string inputs before processing
+// - Respects cultural sensitivities with official country names
 ```
 
 ### Outcome: AI Response Parsing & Error Handling
 
 **Highly Effective Prompts:**
 
-1. **Robust JSON Parsing:**
+1. **Robust JSON Parsing with Enhanced EurovisionSong Factory:**
 
 ```dart
 // Create a resilient Eurovision AI response parser that:
-// - Safely extracts JSON data from AI completions API response
-// - Handles malformed JSON with clear error messages
-// - Validates each song field before creating EurovisionSong objects
-// - Filters out invalid entries (wrong years, countries)
-// - Limits to 5-8 songs maximum for performance
+// - Uses EurovisionSong.fromJson() factory method for consistent validation
+// - Safely extracts JSON data from AI completions API response with try-catch blocks
+// - Handles malformed JSON by falling back to _getFallbackEurovisionSongs()
+// - Parses response.body with proper null checking: result['choices'][0]['message']['content']
+// - Uses jsonList.map((json) => EurovisionSong.fromJson(json as Map<String, dynamic>))
+// - Validates each song automatically through EurovisionSong's built-in validation
+// - Filters out invalid entries through the model's validation logic
+// - Limits to exactly 5 songs and pads with fallback songs if needed
 // - Returns a clearly typed List<EurovisionSong> with null safety
 ```
 
-2. **Comprehensive Fallback System:**
+2. **Comprehensive Fallback System with Non-Const Objects:**
 
 ```dart
 // Implement Eurovision fallback system with:
-// - Pre-defined Eurovision songs for each mood category
-// - At least 3 songs per mood from different decades/countries
-// - Clear indication when falling back to predefined songs
+// - Pre-defined Eurovision songs using EurovisionSong() constructor (not const)
+// - Fallback songs for each mood: _getFallbackEurovisionSongs(String mood)
+// - Switch statement handling: 'frustrated'/'debugging', 'productive'/'flow', default cases
+// - At least 5 songs per mood from different decades/countries
+// - Songs like: Waterloo-Sweden 1974, Euphoria-Sweden 2012, Rise Like a Phoenix-Austria 2014,
+//   Heroes-Sweden 2015, Fuego-Cyprus 2018, 1944-Ukraine 2016, Hard Rock Hallelujah-Finland 2006
+// - Clear indication when falling back with debug messages
 // - Eurovision-themed error messages like "The AI jury is deliberating!"
 // - Graceful degradation that never breaks the user experience
-// - Logging for failed AI requests to improve future prompts
+// - Proper error logging with _debugLog() for failed AI requests
 ```
 
-**Effective Prompts:**
-1. "Write a JSON parser for converting GitHub Models API responses into EurovisionSong objects with error handling."
-2. "Implement a fallback mechanism for when AI fails to generate valid Eurovision songs."
-3. "Create a playlist generation algorithm that maps commit sentiments to appropriate Eurovision song categories."
+**Additional Implementation-Proven Prompts:**
+
+3. **Fixing Constant Expression Issues:**
+
+```dart
+// Fix Dart compilation errors in EurovisionSong model:
+// - Change const EurovisionSong constructor to non-const EurovisionSong
+// - Update static const defaultSong to static final defaultSong
+// - Remove const from all EurovisionSong instantiations in fallback methods
+// - Use EurovisionSong() instead of const EurovisionSong() in _getFallbackSongs()
+// - Ensure constructor assertions work with non-const validation methods
+// - Maintain validation logic while avoiding "Methods can't be invoked in constant expressions" errors
+```
+
+4. **System Message Optimization for GitHub Models:**
+
+```dart
+// Create optimized system message for GitHub Models API that:
+// - Identifies as "Eurovision music expert with deep cultural knowledge"
+// - Emphasizes cultural significance alongside mood matching
+// - Specifies exact requirements: "real Eurovision entry", "valid Eurovision participant"
+// - Requests "brief explanation connecting coding mood to song's cultural significance"
+// - Uses temperature: 0.7 for balanced creativity and accuracy
+// - Includes provider: ApiConfig.aiProvider for GitHub Models compatibility
+```
 
 ## Phase 4: Spotify Playback
 
@@ -434,9 +478,60 @@ The most effective GitVision prompt style based on actual implementation experie
 // proper separation of concerns and testability.
 ```
 
-## Example of Highly Effective Actual Prompt
+## Examples of Highly Effective Actual Prompts
 
-This optimized prompt style has been proven to produce high-quality GitVision code:
+These optimized prompt styles have been proven to produce high-quality GitVision code:
+
+### 1. Complete AIPlaylistService Implementation
+
+```dart
+// For GitVision Eurovision app, implement AIPlaylistService.generateEurovisionPlaylist() that:
+//
+// 1. API Integration requirements:
+//    - Uses GitHub Models API endpoint: https://models.github.ai/inference/chat/completions
+//    - Includes required headers: Accept: application/json, Authorization: Bearer {token},
+//      Content-Type: application/json, X-Request-Type: JSON, X-GitHub-Api-Version: 2022-11-28
+//    - Uses model: ApiConfig.aiModel and provider: ApiConfig.aiProvider
+//    - Implements exponential backoff retry logic for rate limits and timeouts
+//
+// 2. Cultural Eurovision prompting:
+//    - Includes cultural context about Eurovision celebrating diversity and unity
+//    - Maps coding moods to specific Eurovision examples with countries and years
+//    - Emphasizes regional diversity: Nordic efficiency, Eastern European passion, etc.
+//    - Requests exactly 5 songs with title, artist, country, year, reasoning fields
+//
+// 3. Robust parsing and validation:
+//    - Uses EurovisionSong.fromJson() for automatic validation
+//    - Handles malformed responses with fallback to _getFallbackEurovisionSongs()
+//    - Validates years (1956-2025) and countries against valid Eurovision participants
+//    - Returns exactly 5 songs, padding with fallbacks if needed
+```
+
+### 2. Eurovision Song Model with Comprehensive Validation
+
+```dart
+// For GitVision Eurovision app, create EurovisionSong model class that:
+//
+// 1. Validation requirements:
+//    - Contains static List<String> validCountries with all Eurovision participants
+//    - Implements static isValidCountry() method for country validation
+//    - Uses non-const constructor with assert() statements for year (1956-2025) validation
+//    - Validates non-empty title, artist, country in constructor assertions
+//
+// 2. Data handling requirements:
+//    - Enhanced fromJson() factory that validates and sanitizes input data
+//    - Trims string inputs and validates against business rules
+//    - Falls back to defaultSong values for invalid data instead of throwing errors
+//    - Supports fields: title, artist, country, year, reasoning, spotifyUrl, previewUrl, imageUrl
+//
+// 3. Technical requirements:
+//    - Uses static final defaultSong instead of const to avoid constant expression errors
+//    - Implements proper toString() method: "{title} by {artist} ({country}, {year})"
+//    - Includes toJson() method for serialization
+//    - Maintains cultural sensitivity with official Eurovision country names
+```
+
+### 3. GitHub Commit Sentiment Analysis
 
 ```dart
 // For GitVision Eurovision app, implement a GitHub commit sentiment analyzer that:

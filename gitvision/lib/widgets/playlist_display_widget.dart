@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../providers/app_state_provider.dart';
-import '../services/theme_provider.dart';
 import '../models/coding_mood.dart';
-import '../constants/app_constants.dart';
 import '../services/playlist_generator.dart';
-import 'modern_share_widget.dart';
 import 'song_player_widget.dart';
 
 class PlaylistDisplayWidget extends StatelessWidget {
@@ -15,113 +12,79 @@ class PlaylistDisplayWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppStateProvider>(context);
-    final themeProvider = Provider.of<ThemeProvider>(context);
+    
+    print('🎼 [PlaylistWidget] Building UI - commits: ${appState.commits.length}, generating: ${appState.generatingPlaylist}, generated: ${appState.playlistGenerated}, songs: ${appState.playlist.length}');
 
     if (appState.generatingPlaylist) {
-      return _buildGeneratingState(themeProvider);
+      print('🎼 [PlaylistWidget] Showing generating state');
+      return _buildGeneratingState();
     }
 
     if (!appState.playlistGenerated || appState.playlist.isEmpty) {
-      return _buildGenerateButton(appState, themeProvider);
+      print('🎼 [PlaylistWidget] Showing generate button');
+      return _buildGenerateButton(appState);
     }
 
-    return _buildPlaylist(appState, themeProvider);
+    print('🎼 [PlaylistWidget] Showing playlist with ${appState.playlist.length} songs');
+    return _buildPlaylist(appState);
   }
 
-  Widget _buildGeneratingState(ThemeProvider themeProvider) {
-    return Container(
-      padding: const EdgeInsets.all(AppConstants.extraLargeSpacing),
-      decoration: BoxDecoration(
-        color: themeProvider.surfaceColor,
-        borderRadius: BorderRadius.circular(AppConstants.largeBorderRadius),
-      ),
+  Widget _buildGeneratingState() {
+    return const Center(
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(themeProvider.primaryColor),
-          ),
-          const SizedBox(height: AppConstants.defaultSpacing),
+          CircularProgressIndicator(),
+          SizedBox(height: 16),
           Text(
-            'Cooking up your soundtrack...',
+            'Generating your Eurovision playlist...',
             style: TextStyle(
-              fontSize: AppConstants.headingFontSize,
+              fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: themeProvider.textColor,
             ),
           ),
-          const SizedBox(height: AppConstants.smallSpacing),
-          Text(
-            'Matching your vibe to Eurovision hits 🎤',
-            style: TextStyle(
-              color: themeProvider.textColor.withValues(alpha: 0.7),
-            ),
-          ),
+          SizedBox(height: 8),
+          Text('Analyzing your commits 🎤'),
         ],
       ),
     );
   }
 
-  Widget _buildGenerateButton(AppStateProvider appState, ThemeProvider themeProvider) {
-    return Container(
-      padding: const EdgeInsets.all(AppConstants.largeSpacing),
-      decoration: BoxDecoration(
-        color: themeProvider.surfaceColor,
-        borderRadius: BorderRadius.circular(AppConstants.largeBorderRadius),
-        border: Border.all(
-          color: themeProvider.primaryColor.withValues(alpha: 0.2),
-        ),
-      ),
+  Widget _buildGenerateButton(AppStateProvider appState) {
+    return Center(
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.queue_music,
-            size: AppConstants.extraLargeIconSize,
-            color: themeProvider.primaryColor,
+            size: 64,
+            color: Colors.deepPurple,
           ),
-          const SizedBox(height: AppConstants.defaultSpacing),
-          Text(
+          const SizedBox(height: 16),
+          const Text(
             'Ready to generate your playlist!',
             style: TextStyle(
-              fontSize: AppConstants.headingFontSize,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: themeProvider.textColor,
             ),
           ),
-          const SizedBox(height: AppConstants.smallSpacing),
-          Text(
+          const SizedBox(height: 8),
+          const Text(
             'We\'ll analyze your commits and create a personalized Eurovision playlist',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              color: themeProvider.textColor.withValues(alpha: 0.7),
-            ),
           ),
-          const SizedBox(height: AppConstants.largeSpacing),
-          ElevatedButton(
-            onPressed: () => appState.generatePlaylist(),
+          const SizedBox(height: 24),
+          ElevatedButton.icon(
+            onPressed: () {
+              print('🎼 [PlaylistWidget] Generate button clicked!');
+              appState.generatePlaylist();
+            },
+            icon: const Icon(Icons.auto_awesome),
+            label: const Text('Generate Playlist'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: themeProvider.primaryColor,
+              backgroundColor: Colors.deepPurple,
               foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 32,
-                vertical: 16,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppConstants.cardBorderRadius),
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.auto_awesome),
-                const SizedBox(width: AppConstants.smallSpacing),
-                Text(
-                  'Generate Playlist',
-                  style: TextStyle(
-                    fontSize: AppConstants.titleFontSize,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
+              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
             ),
           ),
         ],
@@ -129,353 +92,186 @@ class PlaylistDisplayWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildPlaylist(AppStateProvider appState, ThemeProvider themeProvider) {
-    return Container(
-      decoration: BoxDecoration(
-        color: themeProvider.surfaceColor,
-        borderRadius: BorderRadius.circular(AppConstants.largeBorderRadius),
-        border: Border.all(
-          color: themeProvider.primaryColor.withValues(alpha: 0.2),
+  Widget _buildPlaylist(AppStateProvider appState) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Header
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.deepPurple.shade50,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    _getMoodIcon(appState.detectedVibe),
+                    color: Colors.deepPurple,
+                    size: 24,
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Your Eurovision Playlist',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Mood: ${appState.detectedVibe?.displayName ?? "Productive"}',
+                style: TextStyle(
+                  color: Colors.deepPurple.shade700,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Text(
+                '${appState.playlist.length} songs • Based on ${appState.commits.length} commits',
+                style: TextStyle(color: Colors.grey.shade600),
+              ),
+            ],
+          ),
         ),
-      ),
-      child: Column(
-        children: [
-          // Header with mood
-          _buildPlaylistHeader(appState, themeProvider),
-          
-          // Song list
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
+        
+        const SizedBox(height: 16),
+        
+        // Song list
+        Expanded(
+          child: ListView.builder(
             itemCount: appState.playlist.length,
-            separatorBuilder: (context, index) => Divider(
-              color: themeProvider.primaryColor.withValues(alpha: 0.1),
-              height: 1,
-            ),
             itemBuilder: (context, index) {
               final song = appState.playlist[index];
-              return _buildSongTile(
-                song,
-                index,
-                appState,
-                themeProvider,
-              );
+              return _buildSongTile(song, index, appState);
             },
           ),
-
-          // Share widget
-          const SizedBox(height: AppConstants.defaultSpacing),
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: ModernShareWidget(
-              playlistData: {
-                'playlist': {
-                  'mood': appState.detectedVibe?.name ?? 'productive',
-                  'songs': appState.playlist
-                }
-              },
-              githubHandle: appState.githubUsername,
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Widget _buildPlaylistHeader(AppStateProvider appState, ThemeProvider themeProvider) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            themeProvider.primaryColor.withValues(alpha: 0.1),
-            themeProvider.primaryColor.withValues(alpha: 0.05),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(16),
-          topRight: Radius.circular(16),
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: themeProvider.primaryColor.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              _getMoodIcon(appState.detectedVibe),
-              color: themeProvider.primaryColor,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildSongTile(Map<String, dynamic> song, int index, AppStateProvider appState) {
+    final isCurrentSong = appState.currentlyPlayingIndex == index;
+    
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      elevation: isCurrentSong ? 4 : 1,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Text(
-                  '✨ YOUR EUROVISION CODING PLAYLIST ✨',
-                  style: TextStyle(
-                    fontSize: AppConstants.headingFontSize,
-                    fontWeight: FontWeight.bold,
-                    color: themeProvider.textColor,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: themeProvider.primaryColor.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(AppConstants.cardBorderRadius),
-                  ),
+                CircleAvatar(
+                  backgroundColor: Colors.deepPurple.shade100,
                   child: Text(
-                    'CODE VIBE DETECTED: ${appState.detectedVibe?.displayName.toUpperCase() ?? "PRODUCTIVE"}',
+                    '${index + 1}',
                     style: TextStyle(
-                      fontSize: 12,
+                      color: Colors.deepPurple.shade700,
                       fontWeight: FontWeight.bold,
-                      color: themeProvider.primaryColor,
                     ),
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  'Your commits are radiating some serious energy ⚡',
-                  style: TextStyle(
-                    color: themeProvider.textColor.withValues(alpha: 0.8),
-                    fontSize: 14,
-                    fontStyle: FontStyle.italic,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        song['title'] ?? 'Unknown Title',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: isCurrentSong ? Colors.deepPurple : null,
+                        ),
+                      ),
+                      Text(
+                        '${song['artist'] ?? 'Unknown Artist'} • ${song['country'] ?? 'Unknown'} (${song['year'] ?? 'Unknown'})',
+                        style: TextStyle(color: Colors.grey.shade600),
+                      ),
+                    ],
                   ),
                 ),
-                Text(
-                  '${appState.playlist.length} Eurovision songs • Based on ${appState.commits.length} commits',
-                  style: TextStyle(
-                    color: themeProvider.textColor.withValues(alpha: 0.7),
-                    fontSize: 12,
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    // First try to play in-app if preview URL exists
+                    if (song['preview_url'] != null && song['preview_url'].toString().isNotEmpty) {
+                      print('🎵 Playing song with preview: ${song['preview_url']}');
+                      appState.playSong(index);
+                    } else {
+                      // Try different URL sources
+                      final webUrl = song['webPlayerUrl'] ?? song['spotifyUrl'];
+                      final title = song['title'] ?? '';
+                      final artist = song['artist'] ?? '';
+                      
+                      print('🎵 Song data: $song');
+                      print('🎵 Trying to open: $webUrl');
+                      
+                      if (webUrl != null && webUrl.toString().isNotEmpty) {
+                        try {
+                          final url = Uri.parse(webUrl.toString());
+                          if (await canLaunchUrl(url)) {
+                            await launchUrl(url, mode: LaunchMode.externalApplication);
+                            print('🎵 Opened Spotify URL: $webUrl');
+                          } else {
+                            print('🎵 Cannot launch URL: $webUrl');
+                          }
+                        } catch (e) {
+                          print('🎵 Error launching URL: $e');
+                        }
+                      } else {
+                        // Fallback: Search on Spotify web
+                        final searchUrl = 'https://open.spotify.com/search/${Uri.encodeComponent('$title $artist')}';
+                        try {
+                          final url = Uri.parse(searchUrl);
+                          await launchUrl(url, mode: LaunchMode.externalApplication);
+                          print('🎵 Opened Spotify search: $searchUrl');
+                        } catch (e) {
+                          print('🎵 Error opening Spotify search: $e');
+                        }
+                      }
+                    }
+                  },
+                  icon: Icon(
+                    song['preview_url'] != null && song['preview_url'].toString().isNotEmpty
+                        ? (isCurrentSong && appState.isPlaying ? Icons.pause : Icons.play_arrow)
+                        : Icons.open_in_new
+                  ),
+                  label: Text(
+                    song['preview_url'] != null && song['preview_url'].toString().isNotEmpty
+                        ? (isCurrentSong && appState.isPlaying ? 'Pause' : 'Play')
+                        : 'Spotify'
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: song['preview_url'] != null && song['preview_url'].toString().isNotEmpty
+                        ? Colors.deepPurple
+                        : Colors.green,
+                    foregroundColor: Colors.white,
                   ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSongTile(
-    Map<String, dynamic> song,
-    int index,
-    AppStateProvider appState,
-    ThemeProvider themeProvider,
-  ) {
-    final isPlaying = appState.currentlyPlayingIndex == index && appState.isPlaying;
-    final isCurrentSong = appState.currentlyPlayingIndex == index;
-
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      elevation: isCurrentSong ? 3 : 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: isCurrentSong ? BorderSide(
-          color: themeProvider.primaryColor,
-          width: 1.5,
-        ) : BorderSide.none,
-      ),
-      child: Column(
-        children: [
-          // Album art and song info
-          ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            leading: _buildSongImage(song, themeProvider),
-            title: Text(
-              song['title'] ?? 'Unknown Title',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: isCurrentSong 
-                    ? themeProvider.primaryColor 
-                    : themeProvider.textColor,
-              ),
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${song['artist'] ?? 'Unknown Artist'} • ${song['country'] ?? 'Unknown'} (${song['year'] ?? 'Unknown'})',
-                  style: TextStyle(
-                    color: themeProvider.textColor.withValues(alpha: 0.7),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          
-          // Reasoning
-          if (song['reasoning'] != null && song['reasoning'].toString().isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-              child: Text(
+            if (song['reasoning'] != null && song['reasoning'].toString().isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(
                 song['reasoning'].toString(),
                 style: TextStyle(
                   fontSize: 12,
                   fontStyle: FontStyle.italic,
-                  color: themeProvider.textColor.withValues(alpha: 0.6),
+                  color: Colors.grey.shade600,
                 ),
               ),
-            ),
-          
-          // Playback controls
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SongPlayerWidget(
-              song: song,
-              playlistGenerator: Provider.of<PlaylistGenerator>(appState.context, listen: false),
-            ),
-          ),
-        ],
-      ),
-    );
-              style: TextStyle(
-                fontSize: 12,
-                fontStyle: FontStyle.italic,
-                color: themeProvider.textColor.withValues(alpha: 0.6),
-              ),
-            ),
-          ],
-        ],
-      ),
-      trailing: _buildPlayButton(song, index, isPlaying, appState, themeProvider),
-      onTap: () => _handleSongTap(song, index, appState),
-    );
-  }
-
-  Widget _buildSongImage(Map<String, dynamic> song, ThemeProvider themeProvider) {
-    final imageUrl = song['imageUrl'] as String?;
-    
-    return Container(
-      width: 56,
-      height: 56,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        color: themeProvider.surfaceColor,
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
-        child: imageUrl != null && imageUrl.isNotEmpty
-            ? Image.network(
-                imageUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return _buildFallbackIcon(themeProvider);
-                },
-              )
-            : _buildFallbackIcon(themeProvider),
-      ),
-    );
-  }
-
-  Widget _buildFallbackIcon(ThemeProvider themeProvider) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            themeProvider.primaryColor.withValues(alpha: 0.1),
-            themeProvider.primaryColor.withValues(alpha: 0.2),
+            ],
           ],
         ),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Icon(
-            Icons.music_note,
-            color: themeProvider.primaryColor,
-            size: 24,
-          ),
-          Positioned(
-            bottom: 4,
-            right: 4,
-            child: Container(
-              padding: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                color: themeProvider.primaryColor.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                Icons.star,
-                color: themeProvider.primaryColor,
-                size: 12,
-              ),
-            ),
-          ),
-        ],
       ),
     );
-  }
-
-  Widget _buildPlayButton(
-    Map<String, dynamic> song,
-    int index,
-    bool isPlaying,
-    AppStateProvider appState,
-    ThemeProvider themeProvider,
-  ) {
-    final hasPreview = song['preview_url'] != null && 
-                      (song['preview_url'] as String).isNotEmpty;
-    final isCurrentSong = appState.currentlyPlayingIndex == index;
-    
-    return IconButton(
-      icon: Icon(
-        (isCurrentSong && isPlaying) ? Icons.pause_circle_filled : Icons.play_circle_filled,
-        size: 32,
-      ),
-      color: hasPreview ? themeProvider.primaryColor : Colors.grey,
-      onPressed: () => _handlePlayButtonTap(index, isCurrentSong && isPlaying, appState, song),
-    );
-  }
-
-  void _handleSongTap(Map<String, dynamic> song, int index, AppStateProvider appState) {
-    final hasPreview = song['preview_url'] != null && 
-                      (song['preview_url'] as String).isNotEmpty;
-    
-    if (hasPreview) {
-      _handlePlayButtonTap(index, 
-          appState.currentlyPlayingIndex == index && appState.isPlaying, 
-          appState, song);
-    }
-  }
-
-  void _handlePlayButtonTap(int index, bool isPlaying, AppStateProvider appState, Map<String, dynamic> song) async {
-    final hasPreview = song['preview_url'] != null && 
-                      (song['preview_url'] as String).isNotEmpty;
-                      
-    if (hasPreview) {
-      if (isPlaying) {
-        appState.pausePlayback();
-      } else if (appState.currentlyPlayingIndex == index) {
-        appState.resumePlayback();
-      } else {
-        appState.playSong(index);
-      }
-    } else {
-      final spotifyUrl = song['webPlayerUrl'] as String?;
-      if (spotifyUrl != null && spotifyUrl.isNotEmpty) {
-        try {
-          final uri = Uri.parse(spotifyUrl);
-          if (await canLaunchUrl(uri)) {
-            await launchUrl(uri, mode: LaunchMode.externalApplication);
-          }
-        } catch (e) {
-          // Error handled silently for better UX
-        }
-      }
-    }
   }
 
   IconData _getMoodIcon(CodingMood? mood) {
