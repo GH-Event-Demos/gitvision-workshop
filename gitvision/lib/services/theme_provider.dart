@@ -6,6 +6,16 @@ class ThemeProvider extends ChangeNotifier {
   Color _secondaryColor = const Color(0xFF1ED760); // Lighter Spotify green
   Color _accentColor = const Color(0xFFFFFFFF);
   bool _isDarkMode = true;
+  bool _eurovisionMode = true; // Eurovision theme on by default in Phase 2
+  
+  // Eurovision themes with fun, bold colors
+  final List<List<Color>> _eurovisionThemes = [
+    [const Color(0xFF00A0E4), const Color(0xFF36C8F5), const Color(0xFFE1F5FE)], // Eurovision Blue
+    [const Color(0xFFD80056), const Color(0xFFFF4081), const Color(0xFFFCE4EC)], // Eurovision Pink
+    [const Color(0xFFFFD600), const Color(0xFFFFE57F), const Color(0xFFFFFDE7)], // Eurovision Gold
+    [const Color(0xFF9C27B0), const Color(0xFFBA68C8), const Color(0xFFF3E5F5)], // Eurovision Purple
+    [const Color(0xFFFF6B35), const Color(0xFFFF8A65), const Color(0xFFFFF3E0)], // Eurovision Orange
+  ];
   
   // Dark, developer-focused themes with Spotify vibes
   final List<List<Color>> _codeThemes = [
@@ -21,6 +31,7 @@ class ThemeProvider extends ChangeNotifier {
   Color get secondaryColor => _secondaryColor;
   Color get accentColor => _accentColor;
   bool get isDarkMode => _isDarkMode;
+  bool get eurovisionMode => _eurovisionMode;
   
   // Dark base colors for Spotify-like appearance
   Color get backgroundColor => _isDarkMode 
@@ -52,11 +63,12 @@ class ThemeProvider extends ChangeNotifier {
   
   void randomizeTheme() {
     final random = Random();
-    final themeIndex = random.nextInt(_codeThemes.length);
+    final themes = _eurovisionMode ? _eurovisionThemes : _codeThemes;
+    final themeIndex = random.nextInt(themes.length);
     
-    _primaryColor = _codeThemes[themeIndex][0];
-    _secondaryColor = _codeThemes[themeIndex][1];
-    _accentColor = _codeThemes[themeIndex][2];
+    _primaryColor = themes[themeIndex][0];
+    _secondaryColor = themes[themeIndex][1];
+    _accentColor = themes[themeIndex][2];
     
     notifyListeners();
   }
@@ -68,4 +80,62 @@ class ThemeProvider extends ChangeNotifier {
     
     notifyListeners();
   }
+  
+  void setEurovisionMode(bool enabled) {
+    _eurovisionMode = enabled;
+    // Apply a Eurovision theme if enabled
+    if (enabled) {
+      final random = Random();
+      final themeIndex = random.nextInt(_eurovisionThemes.length);
+      _primaryColor = _eurovisionThemes[themeIndex][0];
+      _secondaryColor = _eurovisionThemes[themeIndex][1];
+      _accentColor = _eurovisionThemes[themeIndex][2];
+    }
+    notifyListeners();
+  }
+  
+  // For Material app theme configuration
+  ThemeData get lightTheme => ThemeData(
+    brightness: Brightness.light,
+    colorScheme: ColorScheme.light(
+      primary: _primaryColor,
+      secondary: _secondaryColor,
+      surface: surfaceColor,
+      background: backgroundColor,
+    ),
+    scaffoldBackgroundColor: backgroundColor,
+    appBarTheme: AppBarTheme(
+      backgroundColor: _primaryColor,
+      foregroundColor: Colors.white,
+    ),
+    cardTheme: CardTheme(
+      color: surfaceColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+    ),
+  );
+  
+  ThemeData get darkTheme => ThemeData(
+    brightness: Brightness.dark,
+    colorScheme: ColorScheme.dark(
+      primary: _primaryColor,
+      secondary: _secondaryColor,
+      surface: surfaceColor,
+      background: backgroundColor,
+    ),
+    scaffoldBackgroundColor: backgroundColor,
+    appBarTheme: AppBarTheme(
+      backgroundColor: _primaryColor,
+      foregroundColor: Colors.white,
+    ),
+    cardTheme: CardTheme(
+      color: surfaceColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+    ),
+  );
+  
+  ThemeMode get themeMode => _isDarkMode ? ThemeMode.dark : ThemeMode.light;
 }

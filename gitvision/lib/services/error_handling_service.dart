@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'analytics_service.dart';
+import 'logging_service.dart';
 
 /// 🛡️ PHASE 5: Production Error Handling Service
 /// 
@@ -16,9 +17,12 @@ import 'analytics_service.dart';
 /// - Error categorization and prioritization
 /// - Recovery strategies and fallbacks
 class ErrorHandlingService {
-  static final ErrorHandlingService _instance = ErrorHandlingService._internal();
-  factory ErrorHandlingService() => _instance;
-  ErrorHandlingService._internal();
+  final AnalyticsService _analytics = AnalyticsService();
+  final LoggingService _logger;
+  bool _isInitialized = false;
+  
+  // Constructor that accepts LoggingService
+  ErrorHandlingService({required LoggingService logger}) : _logger = logger;
 
   final AnalyticsService _analytics = AnalyticsService();
   bool _isInitialized = false;

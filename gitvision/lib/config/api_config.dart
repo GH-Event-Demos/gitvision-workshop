@@ -23,10 +23,9 @@ class ApiConfig {
       "https://accounts.spotify.com/api/token";
   static const String spotifyApiEndpoint = "https://api.spotify.com/v1";
 
-  // Model settings - Model that excels in coding and instruction following
-  static const String aiModel = "openai/gpt-4.1";
-  static const String aiProvider =
-      "azureml"; // Required provider for GitHub Models API
+  // Model settings - GitHub Models API compatible model
+  static const String aiModel = "gpt-4o-mini";
+  static const String aiProvider = "azureml"; // Required for GitHub Models API
 
   // Validation
   static bool get hasValidTokens =>
