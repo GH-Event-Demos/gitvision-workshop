@@ -44,7 +44,6 @@ Welcome to the GitVision documentation hub! This directory contains all the reso
 -  [**Code of Conduct**](../CODE_OF_CONDUCT.md) - Community guidelines
 
 ### **For Learning & Development**
-- ️ [**Workshop Branches Guide**](WORKSHOP-BRANCHES.md) - Branching strategy explained
 - ️ [**Workshop Branches Guide**](workshop-branches.md) - Branching strategy explained
 
 ## 📚 **Documentation Structure**
