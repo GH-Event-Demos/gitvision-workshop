@@ -1,0 +1,47 @@
+{
+  "name": "GitVision Flutter Workshop",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  
+  "features": {
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  "containerEnv": {
+    "FLUTTER_SDK_SKIP_ANDROID_CHECK": "true",
+    "SHELL": "/bin/bash"
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "Dart-Code.dart-code",
+        "Dart-Code.flutter",
+        "ms-vscode.vscode-json",
+        "GitHub.copilot",
+        "GitHub.copilot-chat"
+      ],
+      "settings": {
+        "dart.debugExternalPackageLibraries": true,
+        "dart.debugSdkLibraries": false,
+        "dart.flutterSdkPath": "/opt/flutter"
+      }
+    }
+  },
+
+  "initializeCommand": "which curl git wget unzip xz-utils || echo 'Some dependencies may be missing'",
+
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  
+  "forwardPorts": [3000, 8080],
+  
+  "remoteUser": "vscode",
+  "updateRemoteUserUID": true,
+  
+  "waitFor": "postCreateCommand",
+  
+  "hostRequirements": {
+    "memory": "8gb",
+    "storage": "32gb"
+  }
+}
