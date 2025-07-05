@@ -3,6 +3,23 @@ import 'coding_mood.dart';
 import '../services/logging_service.dart';
 
 class EurovisionSong {
+  // Valid Eurovision countries (past and present)
+  static const List<String> validCountries = [
+    'Albania', 'Andorra', 'Armenia', 'Australia', 'Austria', 'Azerbaijan',
+    'Belarus', 'Belgium', 'Bosnia and Herzegovina', 'Bulgaria', 'Croatia',
+    'Cyprus', 'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'France',
+    'Georgia', 'Germany', 'Greece', 'Hungary', 'Iceland', 'Ireland', 'Israel',
+    'Italy', 'Latvia', 'Lithuania', 'Luxembourg', 'Malta', 'Moldova',
+    'Monaco', 'Montenegro', 'Morocco', 'Netherlands', 'North Macedonia',
+    'Norway', 'Poland', 'Portugal', 'Romania', 'Russia', 'San Marino',
+    'Serbia', 'Slovakia', 'Slovenia', 'Spain', 'Sweden', 'Switzerland',
+    'Turkey', 'Ukraine', 'United Kingdom', 'Yugoslavia'
+  ];
+
+  // Validate if a country is a valid Eurovision participant
+  static bool isValidCountry(String country) {
+    return validCountries.any((c) => c.toLowerCase() == country.toLowerCase());
+  }
   final String title;
   final String artist;
   final String country;
@@ -13,7 +30,7 @@ class EurovisionSong {
   final String? previewUrl;
   final String? imageUrl;
 
-  const EurovisionSong({
+  EurovisionSong({
     required this.title,
     required this.artist,
     required this.country,
@@ -23,7 +40,10 @@ class EurovisionSong {
     this.spotifyUrl,
     this.previewUrl,
     this.imageUrl,
-  });
+  }) : assert(year >= 1956 && year <= 2025, 'Year must be between 1956 and 2025'),
+       assert(title.length > 0, 'Title cannot be empty'),
+       assert(artist.length > 0, 'Artist cannot be empty'),
+       assert(country.length > 0, 'Country cannot be empty');
 
   // Indicates if the song can be played on Spotify
   bool get isPlayable => spotifyUrl != null && (spotifyUrl?.isNotEmpty ?? false);
@@ -53,11 +73,23 @@ class EurovisionSong {
         print('DEBUG: EurovisionSong has no imageUrl or album images');
       }
       
+      // Validate and sanitize data
+      final title = (json['title'] as String?)?.trim() ?? defaultSong.title;
+      final artist = (json['artist'] as String?)?.trim() ?? defaultSong.artist;
+      final countryInput = (json['country'] as String?)?.trim() ?? defaultSong.country;
+      final year = (json['year'] as num?)?.toInt() ?? defaultSong.year;
+      
+      // Validate year range
+      final validYear = (year >= 1956 && year <= 2025) ? year : defaultSong.year;
+      
+      // Validate and fix country
+      final validCountry = isValidCountry(countryInput) ? countryInput : defaultSong.country;
+      
       final song = EurovisionSong(
-        title: json['title'] as String? ?? defaultSong.title,
-        artist: json['artist'] as String? ?? defaultSong.artist,
-        country: json['country'] as String? ?? defaultSong.country,
-        year: (json['year'] as num?)?.toInt() ?? defaultSong.year,
+        title: title.isNotEmpty ? title : defaultSong.title,
+        artist: artist.isNotEmpty ? artist : defaultSong.artist,
+        country: validCountry,
+        year: validYear,
         mood: json['mood'] != null ? CodingMood.fromString(json['mood'] as String) : null,
         reasoning: json['reasoning'] as String?,
         spotifyUrl: json['webPlayerUrl'] as String? ?? json['spotifyUrl'] as String?,
@@ -133,7 +165,7 @@ class EurovisionSong {
   };
 
   // Default song for error cases
-  static const defaultSong = EurovisionSong(
+  static final defaultSong = EurovisionSong(
     title: 'Dancing Lasha Tumbai',
     artist: 'Verka Serduchka',
     country: 'Ukraine',

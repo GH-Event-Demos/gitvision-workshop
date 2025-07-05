@@ -30,6 +30,8 @@ class PlaylistGenerator {
   void _debugLog(String message) {
     if (kDebugMode) {
       print('[PlaylistGenerator] $message');
+      // Also write to console for better visibility
+      debugPrint('CONSOLE: $message');
     }
   }
 
@@ -232,14 +234,7 @@ class PlaylistGenerator {
 
         // Convert JSON objects to EurovisionSongs
         final songs = jsonList.map((json) {
-          return EurovisionSong(
-            title: json['title'] as String? ?? 'Unknown Title',
-            artist: json['artist'] as String? ?? 'Unknown Artist',
-            country: json['country'] as String? ?? 'Europe',
-            year: json['year'] is int ? json['year'] : 2024,
-            reasoning:
-                json['reasoning'] as String? ?? 'Selected by mood analysis',
-          );
+          return EurovisionSong.fromJson(json as Map<String, dynamic>);
         }).toList();
 
         if (songs.length < 5) {
@@ -302,35 +297,35 @@ class PlaylistGenerator {
 
   /// Get fallback songs when API fails
   List<EurovisionSong> _getFallbackSongs() => [
-        const EurovisionSong(
+        EurovisionSong(
           title: 'Waterloo',
           artist: 'ABBA',
           country: 'Sweden',
           year: 1974,
           reasoning: 'The most iconic Eurovision winner',
         ),
-        const EurovisionSong(
+        EurovisionSong(
           title: 'Euphoria',
           artist: 'Loreen',
           country: 'Sweden',
           year: 2012,
           reasoning: 'Modern Eurovision classic',
         ),
-        const EurovisionSong(
+        EurovisionSong(
           title: 'Rise Like a Phoenix',
           artist: 'Conchita Wurst',
           country: 'Austria',
           year: 2014,
           reasoning: 'Powerful Eurovision anthem',
         ),
-        const EurovisionSong(
+        EurovisionSong(
           title: 'Heroes',
           artist: 'Måns Zelmerlöw',
           country: 'Sweden',
           year: 2015,
           reasoning: 'Determined coding energy',
         ),
-        const EurovisionSong(
+        EurovisionSong(
           title: 'Fuego',
           artist: 'Eleni Foureira',
           country: 'Cyprus',
@@ -402,7 +397,9 @@ class PlaylistGenerator {
 
   /// Generate playlist with retry mechanism
   Future<String> _generatePlaylistWithRetry(List<String> commitMessages) async {
-    _debugLog('Making playlist generation request to $_endpoint');
+    _debugLog('🎵 EUROVISION: Making playlist generation request to $_endpoint');
+    _debugLog('🎵 EUROVISION: Using model: $_model with provider: $_provider');
+    _debugLog('🎵 EUROVISION: Processing ${commitMessages.length} commit messages');
     
     int retries = 0;
     const maxRetries = 3;
@@ -441,7 +438,8 @@ class PlaylistGenerator {
         ).timeout(const Duration(seconds: 30));
         
         if (playlistResponse.statusCode == 200) {
-          _debugLog('Playlist generation request successful');
+          _debugLog('🎵 EUROVISION: ✅ GitHub Models API call successful!');
+          _debugLog('🎵 EUROVISION: Response received, extracting Eurovision playlist...');
           return _extractPlaylistTextFromResponse(playlistResponse);
         }
         
@@ -460,7 +458,8 @@ class PlaylistGenerator {
         }
         
         // For other errors
-        _debugLog('ERROR: Playlist API request failed with status ${playlistResponse.statusCode}');
+        _debugLog('🎵 EUROVISION: ❌ GitHub Models API request failed with status ${playlistResponse.statusCode}');
+        _debugLog('🎵 EUROVISION: Response body: ${playlistResponse.body.substring(0, 200)}...');
         if (retries >= maxRetries) {
           throw Exception('Failed to generate playlist after $maxRetries attempts: API returned ${playlistResponse.statusCode}');
         }
@@ -525,7 +524,8 @@ class PlaylistGenerator {
   /// Generate a playable playlist from commits
   Future<Map<String, dynamic>> generatePlayablePlaylist(
       List<Map<String, dynamic>> commits) async {
-    _debugLog('Generating playable playlist from ${commits.length} commits');
+    _debugLog('🎵 EUROVISION: 🚀 Starting Eurovision playlist generation from ${commits.length} commits');
+    _debugLog('🎵 EUROVISION: Will call GitHub Models API at: $_endpoint');
     try {
       // Extract commit messages and analyze mood
       final commitMessages = _extractCommitMessages(commits);
@@ -809,8 +809,8 @@ class GitHubModelsException implements Exception {
 
 class AIPlaylistService {
   final String _githubToken;
-  final String _endpoint = 'https://api.github.com/copilot/chat/completions';
-  final String _model = 'copilot-chat';
+  final String _endpoint = 'https://models.github.ai/inference/chat/completions';
+  final String _model = ApiConfig.aiModel;
 
   AIPlaylistService({required String githubToken}) : _githubToken = githubToken;
 
@@ -839,8 +839,12 @@ class AIPlaylistService {
 
   String _buildEurovisionPrompt(SentimentResult sentiment) {
     return '''
-    Create a playlist of EXACTLY 5 Eurovision songs that match a ${sentiment.mood} coding mood.
+    Create a Eurovision playlist of EXACTLY 5 songs that match a ${sentiment.mood} coding mood.
     Confidence: ${sentiment.confidence}
+    
+    CULTURAL CONTEXT: Eurovision is Europe's beloved song contest celebrating diversity, 
+    creativity, and unity through music. Each song represents a country's cultural 
+    identity and artistic expression. Consider both musical energy and cultural significance.
     
     IMPORTANT: Return ONLY a JSON array with exactly 5 songs.
     NO text before or after the array. Format:
@@ -851,22 +855,24 @@ class AIPlaylistService {
         "artist": "ARTIST_NAME",
         "country": "COUNTRY_NAME",
         "year": YEAR_NUMBER,
-        "reasoning": "Why this song matches ${sentiment.mood} mood"
+        "reasoning": "Why this song matches ${sentiment.mood} mood and its cultural significance"
       },
       ... exactly 4 more songs ...
     ]
 
     Song Selection Rules:
-    1. All songs must be actual Eurovision entries (1956-2024)
-    2. Mix different decades and countries
+    1. All songs must be actual Eurovision entries (1956-2025)
+    2. Mix different decades and countries for cultural diversity
     3. For ${sentiment.mood} mood, consider:
-       - Productive → Energetic anthems (Euphoria, Fuego)
-       - Intense/Debug → Power songs (Rise Like a Phoenix, 1944)
-       - Creative → Unique entries (Shum, Dancing Lasha Tumbai)
-       - Victory → Winners (Heroes, Waterloo)
-       - Reflective → Emotional songs (Arcade, Soldi)
-    4. Use accurate historical data
-    5. Must return exactly 5 songs
+       - Productive → Energetic anthems (Euphoria-Sweden 2012, Fuego-Cyprus 2018)
+       - Intense/Debug → Power songs (Rise Like a Phoenix-Austria 2014, 1944-Ukraine 2016)
+       - Creative → Unique entries (Shum-Ukraine 2021, Dancing Lasha Tumbai-Ukraine 2007)
+       - Victory → Winners (Heroes-Sweden 2015, Waterloo-Sweden 1974)
+       - Reflective → Emotional songs (Arcade-Netherlands 2019, Soldi-Italy 2019)
+    4. Include cultural diversity: Nordic efficiency, Eastern European passion, 
+       Mediterranean warmth, British innovation, etc.
+    5. Use accurate historical data and consider the song's impact on Eurovision history
+    6. Must return exactly 5 songs
 
     Keywords from commits: ${sentiment.keywords.join(', ')}
     ''';
@@ -884,25 +890,27 @@ class AIPlaylistService {
             .post(
               Uri.parse(_endpoint),
               headers: {
+                'Accept': 'application/json',
                 'Authorization': 'Bearer $_githubToken',
                 'Content-Type': 'application/json',
-                'User-Agent': 'GitVision-Eurovision-App',
-                'Accept': 'application/json',
+                'X-Request-Type': 'JSON',
+                'X-GitHub-Api-Version': '2022-11-28'
               },
               body: jsonEncode({
                 'model': _model,
+                'provider': ApiConfig.aiProvider,
                 'temperature': 0.7,
                 'messages': [
                   {
                     'role': 'system',
                     'content':
-                        '''You are a Eurovision music expert. Analyze commit messages and suggest songs that match their mood.
+                        '''You are a Eurovision music expert with deep cultural knowledge. Analyze commit messages and suggest songs that match their mood.
 Always return a JSON array with EXACTLY 5 Eurovision songs. Each song must be a real Eurovision entry with:
 - title: Song title
 - artist: Artist name
-- country: Country represented
-- year: Competition year (1956-2024)
-- reasoning: Brief explanation of why this song matches the coding mood'''
+- country: Country represented (must be valid Eurovision participant)
+- year: Competition year (1956-2025)
+- reasoning: Brief explanation connecting coding mood to song's cultural significance'''
                   },
                   {'role': 'user', 'content': prompt}
                 ],
@@ -967,14 +975,7 @@ Always return a JSON array with EXACTLY 5 Eurovision songs. Each song must be a 
             'DEBUG: Successfully parsed JSON list with ${jsonList.length} songs');
 
         final songs = jsonList.map((json) {
-          return EurovisionSong(
-            title: json['title'] as String? ?? 'Unknown Title',
-            artist: json['artist'] as String? ?? 'Unknown Artist',
-            country: json['country'] as String? ?? 'Europe',
-            year: json['year'] is int ? json['year'] : 2024,
-            reasoning:
-                json['reasoning'] as String? ?? 'Selected by mood analysis',
-          );
+          return EurovisionSong.fromJson(json as Map<String, dynamic>);
         }).toList();
 
         if (songs.length < 5) {
@@ -1001,7 +1002,7 @@ Always return a JSON array with EXACTLY 5 Eurovision songs. Each song must be a 
       case 'frustrated':
       case 'debugging':
         return [
-          const EurovisionSong(
+          EurovisionSong(
             title: 'Rise Like a Phoenix',
             artist: 'Conchita Wurst',
             country: 'Austria',
@@ -1011,7 +1012,7 @@ Always return a JSON array with EXACTLY 5 Eurovision songs. Each song must be a 
             previewUrl:
                 'https://p.scdn.co/mp3-preview/b2839485e2736d3ba7419ded6f7d30b2dfbdef3f',
           ),
-          const EurovisionSong(
+          EurovisionSong(
             title: '1944',
             artist: 'Jamala',
             country: 'Ukraine',
@@ -1021,7 +1022,7 @@ Always return a JSON array with EXACTLY 5 Eurovision songs. Each song must be a 
             previewUrl:
                 'https://p.scdn.co/mp3-preview/c158b2d6ca5a53dec644d74498d49c010d121c16',
           ),
-          const EurovisionSong(
+          EurovisionSong(
             title: 'Hard Rock Hallelujah',
             artist: 'Lordi',
             country: 'Finland',
@@ -1032,7 +1033,7 @@ Always return a JSON array with EXACTLY 5 Eurovision songs. Each song must be a 
             previewUrl:
                 'https://p.scdn.co/mp3-preview/f5g9c2e6d4b8a1e7c3f6a2d5e8b1f4e7c2d5e8a',
           ),
-          const EurovisionSong(
+          EurovisionSong(
             title: 'Sound of Silence',
             artist: 'Dami Im',
             country: 'Australia',
@@ -1044,7 +1045,7 @@ Always return a JSON array with EXACTLY 5 Eurovision songs. Each song must be a 
             previewUrl:
                 'https://p.scdn.co/mp3-preview/c8f6b9e2a5d8c1f4e7a3d6e9c2f5a8d1e4c7f2e',
           ),
-          const EurovisionSong(
+          EurovisionSong(
             title: 'Spirit in the Sky',
             artist: 'Keiino',
             country: 'Norway',
@@ -1061,7 +1062,7 @@ Always return a JSON array with EXACTLY 5 Eurovision songs. Each song must be a 
       case 'productive':
       case 'flow':
         return [
-          const EurovisionSong(
+          EurovisionSong(
             title: 'Euphoria',
             artist: 'Loreen',
             country: 'Sweden',
@@ -1071,7 +1072,7 @@ Always return a JSON array with EXACTLY 5 Eurovision songs. Each song must be a 
             previewUrl:
                 'https://p.scdn.co/mp3-preview/cad6841f50b565a0e241917e95a4263380859384',
           ),
-          const EurovisionSong(
+          EurovisionSong(
             title: 'Fuego',
             artist: 'Eleni Foureira',
             country: 'Cyprus',
@@ -1081,7 +1082,7 @@ Always return a JSON array with EXACTLY 5 Eurovision songs. Each song must be a 
             previewUrl:
                 'https://p.scdn.co/mp3-preview/2741de3c852e8628c6f193f4b879fb41a2a54647',
           ),
-          const EurovisionSong(
+          EurovisionSong(
             title: 'Waterloo',
             artist: 'ABBA',
             country: 'Sweden',
@@ -1091,7 +1092,7 @@ Always return a JSON array with EXACTLY 5 Eurovision songs. Each song must be a 
             previewUrl:
                 'https://p.scdn.co/mp3-preview/6de1df17d3eb49211d53c435e26282bb180fae81',
           ),
-          const EurovisionSong(
+          EurovisionSong(
             title: 'Heroes',
             artist: 'Måns Zelmerlöw',
             country: 'Sweden',
@@ -1101,7 +1102,7 @@ Always return a JSON array with EXACTLY 5 Eurovision songs. Each song must be a 
             previewUrl:
                 'https://p.scdn.co/mp3-preview/f4ebc94b8e67c00c1bbf2332c8ca06ea9dd1359f',
           ),
-          const EurovisionSong(
+          EurovisionSong(
             title: 'Satellite',
             artist: 'Lena',
             country: 'Germany',
@@ -1115,7 +1116,7 @@ Always return a JSON array with EXACTLY 5 Eurovision songs. Each song must be a 
 
       default:
         return [
-          const EurovisionSong(
+          EurovisionSong(
             title: 'Heroes',
             artist: 'Måns Zelmerlöw',
             country: 'Sweden',
@@ -1125,7 +1126,7 @@ Always return a JSON array with EXACTLY 5 Eurovision songs. Each song must be a 
             previewUrl:
                 'https://p.scdn.co/mp3-preview/f4ebc94b8e67c00c1bbf2332c8ca06ea9dd1359f',
           ),
-          const EurovisionSong(
+          EurovisionSong(
             title: 'Euphoria',
             artist: 'Loreen',
             country: 'Sweden',
@@ -1135,7 +1136,7 @@ Always return a JSON array with EXACTLY 5 Eurovision songs. Each song must be a 
             previewUrl:
                 'https://p.scdn.co/mp3-preview/cad6841f50b565a0e241917e95a4263380859384',
           ),
-          const EurovisionSong(
+          EurovisionSong(
             title: 'Fuego',
             artist: 'Eleni Foureira',
             country: 'Cyprus',
@@ -1145,7 +1146,7 @@ Always return a JSON array with EXACTLY 5 Eurovision songs. Each song must be a 
             previewUrl:
                 'https://p.scdn.co/mp3-preview/2741de3c852e8628c6f193f4b879fb41a2a54647',
           ),
-          const EurovisionSong(
+          EurovisionSong(
             title: 'Waterloo',
             artist: 'ABBA',
             country: 'Sweden',
@@ -1155,7 +1156,7 @@ Always return a JSON array with EXACTLY 5 Eurovision songs. Each song must be a 
             previewUrl:
                 'https://p.scdn.co/mp3-preview/6de1df17d3eb49211d53c435e26282bb180fae81',
           ),
-          const EurovisionSong(
+          EurovisionSong(
             title: 'Satellite',
             artist: 'Lena',
             country: 'Germany',
