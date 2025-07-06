@@ -1,0 +1,15 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run GitVision Workshop App",
+			"type": "shell",
+			"command": "cd gitvision && flutter run -d chrome",
+			"group": "test",
+			"isBackground": false,
+			"problemMatcher": [
+				"$dart-build"
+			]
+		}
+	]
+}
