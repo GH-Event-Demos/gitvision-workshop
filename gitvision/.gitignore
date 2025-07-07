@@ -46,3 +46,4 @@ app.*.map.json
 
 # Sensitive configuration files
 lib/config/api_tokens.dart
+
