@@ -29,26 +29,18 @@
 - [📚 Resources & References](#-resources--references)
 - [🏆 Bonus Challenges](#-bonus-challenges)
 
-</details>
-
-## 🎯 What You'll Build
-
-By the end of this workshop, you'll have built:
-- **Phase 1**: A working Flutter app that analyzes GitHub commits
-- **Phase 2**: AI-powered Eurovision song recommendations using GitHub Models API
-- **Phase 3**: Spotify integration for playable playlists
+</details> 
 
 <details>
 <summary><b>👁️ Preview of Final Result</b></summary>
-<br>
-<ul>
-<li>AI-powered commit sentiment analyzer</li>
-<li>Eurovision song recommendation engine with country flags</li>
-<li>Playable Spotify integration</li>
-</ul>
-</details>
 
----
+<img alt="gifcomplete" src="https://github.com/user-attachments/assets/43c5cbab-6f04-4978-ab00-92195873fb82">
+
+  - Agentic and context engineering practice is the Priority - Even if you only complete Phase 1, you've learned professional-grade skills
+- Eurovision App is a Bonus - The Three Pillars techniques are what matter most
+- No Pressure to Finish - Learning the methodology is more valuable than completing every feature
+
+</details>
 
 ## 🚀 Getting Started (10 minutes)
 
