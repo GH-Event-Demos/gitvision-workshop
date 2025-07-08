@@ -1,35 +1,27 @@
 ---
 mode: 'agent'
-tools: ['perplexity-ask', 'Context7', 'gdrive', 'weather']
-description: 'AI-powered business strategy research'
+tools: [ 'perplexity_ask' ]
+description: 'Research an idea'
 ---
 
-Conduct comprehensive market research using AI to develop GitVision's business strategy:
+Perform an in depth analysis of the provided idea:
 
-## Multi-Phase Research Process:
+A mobile app called GitVision that takes a user's github handle and returns a list of eurovision songs based on the vibe of their last 50 commits. User should be able to play the songs in the app.
 
-### Phase 1: Market Sizing & Validation (5 min)
-- Developer tool market size and growth
-- Music app market trends and revenue models
-- GitHub developer demographics and behavior
-- Eurovision fan overlap with tech communities
+Rules:
+- Clarify any details that might be helpful before starting to research my idea.
+- Start your session with me by doing some research using the #tool:f1e_perplexity_ask. Look for information that may inform my customer base, problem statements, features, marketing, and business plan.
+- Summarize your findings that might be relevant to me before beginning the next step.
+- Perform another research loop if asked.
 
-### Phase 2: Competitive Intelligence (5 min)  
-- Direct competitors (developer + music apps)
-- Indirect competitors (productivity apps, music apps)
-- Feature gap analysis and differentiation opportunities
-- Pricing strategies in adjacent markets
+Include the following pivots in your research:
+-Customers
+-Problem statements
+-Possible competitors
+-Unmet needs
+-Differentiators
+-Marketing
+-Business models
 
-### Phase 3: Technology Trend Analysis (5 min)
-- AI-powered recommendation engine trends
-- API-first business model success stories
-- Flutter app market penetration and success rates
-- Eurovision digital content monetization
+WHEN DONE, output to #file:../../docs/research.md.on: 'AI-powered business strategy research'
 
-### Phase 4: Go-to-Market Strategy Research (5 min)
-- Developer community marketing channels
-- Eurovision fan community engagement tactics
-- Viral app growth case studies
-- Partnership opportunities (Spotify, Eurovision, GitHub)
-
-DELIVERABLE: Complete business strategy report with market entry recommendations, competitive positioning, and growth tactics specifically tailored for GitVision.
