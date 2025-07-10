@@ -70,7 +70,7 @@ chmod +x workshop-start.sh
 ### Step 3: Set Up API Access
 1. Get your API tokens:
    - [GitHub Token](https://github.com/settings/tokens) (needs repo access)
-   - [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+   - [Spotify Developer Dashboard](https://developer.spotify.com/dashboard) - See our [detailed Spotify setup guide](workshop/spotify-app-setup.md)
 
 2. Configure tokens in `lib/config/api_tokens.dart`:
    ```dart
