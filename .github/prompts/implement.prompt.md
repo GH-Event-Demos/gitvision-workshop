@@ -2,7 +2,7 @@
 mode: 'agent'
 description: 'Implement a plan step by step'
 ---
-Your task is to systematically implement each step of the provided plan, one at a time.
+Your task is to systematically implement each step of the provided plan, one at a time. You can find the plan in gitvision/lib/implementation.plan.dart. Each step will be executed sequentially, and you must ensure that all code adheres to the project rules and technical specifications.
 
 The implementation plan is just a suggestion meant to provide a high-level overview of the objective. Use it to guide you, but you do not have to adhere to it strictly. Make sure to follow the given rules as you work along the lines of the plan.
 
