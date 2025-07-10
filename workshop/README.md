@@ -31,6 +31,7 @@ Welcome to the GitVision documentation hub! This directory contains all the reso
 ### **For Workshop Participants**
 - 📖 [**Workshop Guide**](../WORKSHOP.md) - Complete 120-minute workshop walkthrough
 - 🔧 [**Setup Checklist**](setup-checklist.md) - Pre-workshop requirements and environment setup
+- 🎵 [**Spotify App Setup**](spotify-app-setup.md) - Detailed guide for configuring Spotify developer credentials
 - 🆘 [**Troubleshooting Playbook**](troubleshooting-playbook.md) - Quick solutions for common issues
 - 📚 [**Next Steps & Resources**](next-steps.md) - Continue learning after the workshop
 

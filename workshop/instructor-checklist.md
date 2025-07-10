@@ -21,6 +21,7 @@
 - [ ] **Spotify Developer**: Direct to [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard)
   - App name: "GitVision Eurovision"
   - Redirect URI: `gitvision://callback`
+  - **Detailed setup guide**: [spotify-app-setup.md](spotify-app-setup.md)
 
 ### 📚 Participant Instructions
 Share this repository link: `https://github.com/AndreaGriffiths11/gitvision-andrea`

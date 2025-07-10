@@ -12,7 +12,7 @@
 
 ### 🔑 API Credentials Ready
 - [ ] **GitHub Personal Access Token** generated (with `repo`, `user` scopes)
-- [ ] **Spotify Developer Account** created with Client ID/Secret
+- [ ] **Spotify Developer Account** created with Client ID/Secret ([setup guide](spotify-app-setup.md))
 - [ ] **Tokens stored securely** (password manager, encrypted notes)
 - [ ] **API tokens configured** in `gitvision/lib/config/api_tokens.dart`
 
