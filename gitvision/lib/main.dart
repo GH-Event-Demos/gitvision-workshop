@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-// TODO: Add HTTP and JSON imports when implementing GitHub API
+import 'models/sentiment_result.dart';
+import 'widgets/commit_analysis_display.dart';
+import 'sentiment_analyzer.dart';
 
 void main() {
   runApp(const GitVisionApp());
