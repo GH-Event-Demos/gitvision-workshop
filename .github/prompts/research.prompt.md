@@ -6,7 +6,7 @@ description: 'Research an idea'
 
 Perform an in depth analysis of the provided idea:
 
-A mobile app called GitVision that takes a user's github handle and returns a list of eurovision songs based on the vibe of their last 50 commits. User should be able to play the songs in the app.
+A mobile app called GitVision that takes a user's github handle and returns a list of eurovision songs based on the vibe of their last 50 commits. User should be able to play the songs in the app. Audience is developers who are Eurovision fans.
 
 Rules:
 - Clarify any details that might be helpful before starting to research my idea.
@@ -22,6 +22,7 @@ Include the following pivots in your research:
 -Differentiators
 -Marketing
 -Business models
+- create a 3 phase developmentplan for the next steps
 
 WHEN DONE, output to #file:../../docs/research.md.on: 'AI-powered business strategy research'
 
