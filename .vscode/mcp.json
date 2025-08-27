@@ -20,13 +20,10 @@
                 "run",
                 "-i",
                 "--rm",
-                "-e",
-                "PERPLEXITY_API_KEY",
+                "-e", 
+                "PERPLEXITY_API_KEY=${input:perplexity-key}",
                 "mcp/perplexity-ask"
-            ],
-            "env": {
-                "PERPLEXITY_API_KEY": "${input:perplexity-key}"
-            }
+            ]
         },
         "github": {
             "type": "http",
