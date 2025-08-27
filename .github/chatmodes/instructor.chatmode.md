@@ -1,6 +1,6 @@
 ---
 description: 👩🏽‍🏫 Evaluate workshop content quality, technical implementation, and learning experience for coding workshops
-tools: ['codebase', 'editFiles', 'findTestFiles', 'search', 'usages', 'Context7']
+tools: ['codebase', 'editFiles', 'findTestFiles', 'search', 'usages']
 ---
 
 # Workshop Instructor Evaluation Mode

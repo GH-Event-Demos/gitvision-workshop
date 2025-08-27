@@ -13,4 +13,22 @@ RULES:
 - For each step in your plan, include the objective of the step, the steps to achieve that objective, and any necessary pseudocode.
 - Call out any necessary user intervention required for each step
 
-Output your plan in #folder:../../docs/plans/plan-name.md
+Output your plan in #folder: docs/plans
+
+OUTPUT FORMAT:
+Create a markdown file with the following structure:
+- # Implementation Plan: [Feature Name]
+- ## Overview
+- ## Implementation Steps
+  - ### Step 1: [Step Name]
+    - **Objective:** [What this step achieves]
+    - **Steps:** [Numbered list of implementation steps]
+    - **Pseudocode:** [High-level pseudocode if needed]
+    - **User Intervention:** [Any required user actions]
+  - ### Step 2: [Step Name]
+    - [Continue format...]
+- ## Dependencies
+- ## Success Criteria
+- ## Risk Mitigation
+
+EXAMPLE OUTPUT FILE: See docs/plans/example-implementation-plan.md for reference.
