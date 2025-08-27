@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/app_state_provider.dart';
 import '../services/theme_provider.dart';
+import '../utils/accessibility_helpers.dart';
 
 class GitHubConnectionWidget extends StatefulWidget {
   const GitHubConnectionWidget({super.key});
@@ -38,16 +39,27 @@ class _GitHubConnectionWidgetState extends State<GitHubConnectionWidget> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Input field
-          TextField(
+          AccessibilityHelpers.accessibleTextField(
             controller: _urlController,
+            label: 'GitHub Username',
+            hint: 'your-github-username',
+            semanticLabel: AccessibilityConstants.githubUsernameField,
             enabled: true,
-            autofocus: false,
+            onChanged: (value) {
+              print('DEBUG: TextField onChanged called with: $value');
+              appState.updateGitHubUsername(value);
+            },
+            onSubmitted: (value) {
+              print('DEBUG: TextField onSubmitted called with: $value');
+              if (value.isNotEmpty) {
+                _connectToUser(appState);
+              }
+            },
+            prefixIcon: Icon(
+              Icons.alternate_email,
+              color: themeProvider.primaryColor,
+            ),
             decoration: InputDecoration(
-              hintText: 'your-github-username',
-              prefixIcon: Icon(
-                Icons.alternate_email,
-                color: themeProvider.primaryColor,
-              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
@@ -68,17 +80,6 @@ class _GitHubConnectionWidgetState extends State<GitHubConnectionWidget> {
                 ),
               ),
             ),
-            style: TextStyle(color: themeProvider.textColor),
-            onChanged: (value) {
-              print('DEBUG: TextField onChanged called with: $value');
-              appState.updateGitHubUsername(value);
-            },
-            onSubmitted: (value) {
-              print('DEBUG: TextField onSubmitted called with: $value');
-              if (value.isNotEmpty) {
-                _connectToUser(appState);
-              }
-            },
           ),
 
           const SizedBox(height: 16),
@@ -91,38 +92,46 @@ class _GitHubConnectionWidgetState extends State<GitHubConnectionWidget> {
           // Connect button
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton(
-              onPressed: appState.githubUsername.isNotEmpty && !appState.isConnecting
-                  ? () => _connectToUser(appState)
-                  : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: themeProvider.primaryColor,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            child: Semantics(
+              label: appState.commits.isNotEmpty 
+                  ? 'Reconnect to GitHub to refresh commits' 
+                  : AccessibilityConstants.connectButton,
+              button: true,
+              enabled: appState.githubUsername.isNotEmpty && !appState.isConnecting,
+              child: ElevatedButton(
+                onPressed: appState.githubUsername.isNotEmpty && !appState.isConnecting
+                    ? () => _connectToUser(appState)
+                    : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: themeProvider.primaryColor,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-              ),
-              child: appState.isConnecting
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                child: appState.isConnecting
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: AccessibilityHelpers.accessibleLoadingIndicator(
+                              description: AccessibilityConstants.connectingToGithub,
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        Text('Connecting...'),
-                      ],
-                    )
-                  : Text(
-                      appState.commits.isNotEmpty ? 'Reconnect to GitHub' : 'Connect to GitHub',
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
+                          const SizedBox(width: 12),
+                          const Text('Connecting...'),
+                        ],
+                      )
+                    : Text(
+                        appState.commits.isNotEmpty ? 'Reconnect to GitHub' : 'Connect to GitHub',
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+              ),
             ),
           ),
 
@@ -160,28 +169,32 @@ class _GitHubConnectionWidgetState extends State<GitHubConnectionWidget> {
       return const SizedBox.shrink();
     }
 
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: statusColor.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: statusColor.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        children: [
-          Icon(statusIcon, color: statusColor, size: 20),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              statusText,
-              style: TextStyle(
-                color: statusColor,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+    return Semantics(
+      label: 'Connection status: $statusText',
+      liveRegion: true,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: statusColor.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: statusColor.withValues(alpha: 0.3)),
+        ),
+        child: Row(
+          children: [
+            Icon(statusIcon, color: statusColor, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                statusText,
+                style: TextStyle(
+                  color: statusColor,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
