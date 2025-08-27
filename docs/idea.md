@@ -1,70 +1,134 @@
 # GitVision: Eurovision Edition
 
-## Project Overview
+## 1. Product Overview
 
-GitVision is a Flutter application that transforms GitHub commit messages into AI-curated Eurovision playlists. The app analyzes a developer's coding patterns and mood through their commit history, then uses AI to recommend Eurovision songs that match their coding "vibe".
+### Core Value Proposition
+GitVision transforms developers' GitHub commit history into personalized Eurovision playlists using AI analysis. By examining coding patterns and commit messages, the app creates culturally diverse music recommendations that match developers' programming "vibe," celebrating both technical achievement and European musical heritage.
 
-## Core Features
+### Target Audience
+- **Primary**: Software developers and coding enthusiasts interested in unique music discovery
+- **Secondary**: Eurovision fans exploring technology, workshop participants learning Flutter development
+- **Workshop Focus**: Educational tool for teaching AI integration, API management, and cross-cultural software development
 
-### Phase 1: GitHub Integration
-- GitHub handle input and validation
-- Fetch up to 50 recent public commit messages
-- Basic sentiment analysis of commit patterns
-- Error handling for invalid handles and API failures
+## 2. Functional Specifications
 
-### Phase 2: AI Eurovision Magic
-- Integration with GitHub Models API
-- AI-powered Eurovision song recommendations based on commit sentiment
-- Structured parsing of AI responses into Eurovision song data
-- Cultural sensitivity and Eurovision context awareness
+### 2.1 User Onboarding & Authentication
+- **User Story**: As a new user, I want to easily understand the app's purpose and get started without complex setup
+- **Acceptance Criteria**:
+  - Clear onboarding flow explaining Eurovision-GitHub connection
+  - Optional user account creation for playlist history
+  - Privacy policy acknowledgment for API data usage
 
-### Phase 3: Spotify Integration
-- Spotify OAuth authentication
-- Search for Eurovision songs on Spotify
-- Create playable playlists
-- Handle missing tracks and provide fallbacks
+### 2.2 GitHub Integration
+- **User Story**: As a developer, I want to input my GitHub handle and see my recent coding activity analyzed
+- **Acceptance Criteria**:
+  - GitHub handle validation and normalization
+  - Fetch last 50 commits from public repositories only
+  - Handle users with private repos or no public commits
+  - Display commit summary with mood indicators
 
-## Technical Stack
+### 2.3 AI-Powered Analysis
+- **User Story**: As a user, I want AI to analyze my commits and recommend Eurovision songs matching my coding style
+- **Acceptance Criteria**:
+  - Integration with GitHub Models API for sentiment analysis
+  - Mood classification (Productive, Debugging, Creative, Victory, Reflective)
+  - Generate 5-8 Eurovision song recommendations with reasoning
+  - Cultural sensitivity in song selection across Eurovision's history (1956-2024)
 
-- **Flutter 3.7+** for cross-platform development
-- **GitHub API** for commit data retrieval
-- **GitHub Models API** for AI-powered recommendations
-- **Spotify Web API** for playlist creation and playback
-- **HTTP package** for API communications
+### 2.4 Spotify Integration
+- **User Story**: As a music lover, I want to create and play actual Spotify playlists from my Eurovision recommendations
+- **Acceptance Criteria**:
+  - Spotify OAuth 2.0 authentication flow
+  - Search Spotify catalog for recommended Eurovision songs
+  - Create new playlist with found tracks
+  - Handle missing songs with alternative recommendations
+  - Provide playlist sharing and playback controls
 
-## Cultural Context
+### 2.5 Error Handling & Edge Cases
+- **User Story**: As a user encountering issues, I want clear guidance on how to resolve problems
+- **Acceptance Criteria**:
+  - Network connectivity error messages
+  - Invalid GitHub handle handling
+  - Private repository access limitations
+  - Spotify authentication failures
+  - API rate limiting with retry mechanisms
+  - Fallback recommendations when AI analysis fails
 
-The app celebrates Eurovision's diversity by:
-- Using accurate country names and flag emojis
-- Handling historical changes (Yugoslavia → Serbia, etc.)
-- Respecting Eurovision's inclusion values
-- Mapping coding moods to Eurovision musical styles
+## 3. Technical Specifications
 
-## Mood-to-Eurovision Mapping
+### Architecture Overview
+- **Frontend**: Flutter 3.7+ for cross-platform mobile development (iOS/Android)
+- **Backend Services**: Direct API integrations (no custom backend required)
+- **State Management**: Provider pattern for app-wide state
+- **Data Flow**: GitHub API → AI Analysis → Spotify Search → Playlist Creation
 
-| Commit Mood | Eurovision Style | Example |
-|-------------|------------------|---------|
-| **Productive/Flow** | Upbeat anthems | "Euphoria" (Sweden 2012) 🇸🇪 |
-| **Debugging/Intense** | Power ballads | "Rise Like a Phoenix" (Austria 2014) 🇦🇹 |
-| **Creative/Experimental** | Unique entries | "Shum" (Ukraine 2021) 🇺🇦 |
-| **Victory/Breakthrough** | Winners | "Waterloo" (ABBA 1974) 🇸🇪 |
-| **Reflective/Cleanup** | Emotional songs | "1944" (Ukraine 2016) 🇺🇦 |
+### Key Technical Components
+- **API Integrations**:
+  - GitHub REST API v3 for commit data
+  - GitHub Models API for AI analysis
+  - Spotify Web API for music search and playlist management
+- **Authentication**: OAuth 2.0 flows for Spotify, GitHub token validation
+- **Data Processing**: JSON parsing, sentiment analysis, cultural data validation
+- **Error Handling**: Comprehensive exception handling with user-friendly messages
 
-## Workshop Context
+### Platform & Performance Considerations
+- **Target Platforms**: iOS 12+, Android API 21+, with web support for workshops
+- **Performance**: Optimize API calls with caching, implement loading states
+- **Security**: Secure token storage, HTTPS-only communications, privacy compliance
+- **Scalability**: Stateless design allowing horizontal scaling if needed
 
-This is designed as a 2-hour workshop covering:
-- Flutter development best practices
-- Multi-API integration patterns
-- AI service integration
-- Error handling and user experience
-- Cultural sensitivity in software development
+## 4. MVP Scope
 
-## Success Criteria
+### Core MVP Features (2-hour workshop deliverable)
+1. **GitHub Handle Input** - Simple text field with validation
+2. **Commit Analysis** - Fetch and display last 10 commits with basic parsing
+3. **AI Song Generation** - Call GitHub Models API for 3 Eurovision recommendations
+4. **Spotify Authentication** - Basic OAuth flow completion
+5. **Playlist Creation** - Generate playlist with found tracks
 
-By the end of implementation:
-- ✅ Fetches and analyzes GitHub commit history
-- ✅ Generates AI-powered Eurovision recommendations
-- ✅ Creates playable Spotify playlists
-- ✅ Handles all error cases gracefully
-- ✅ Provides culturally sensitive Eurovision content</content>
+### Success Criteria for MVP
+- ✅ User can input GitHub handle and see commit analysis
+- ✅ AI generates relevant Eurovision song recommendations
+- ✅ Spotify playlist created and playable
+- ✅ All error cases handled with clear user messages
+- ✅ App runs on both iOS and Android test devices
+
+### Post-MVP Enhancements
+- Advanced sentiment analysis with mood visualization
+- Playlist customization (reorder, remove songs)
+- Social sharing of generated playlists
+- User history and playlist library
+- Offline mode with cached recommendations
+
+## 5. Additional Considerations
+
+### Edge Cases & Error Scenarios
+- **No Public Commits**: Users with only private repositories
+- **Invalid Handles**: Non-existent GitHub usernames
+- **API Failures**: Rate limiting, service outages, authentication issues
+- **Missing Songs**: Eurovision tracks not available on Spotify
+- **Network Issues**: Offline usage and poor connectivity handling
+- **Cultural Sensitivity**: Ensuring diverse Eurovision representation
+
+### Technical Risks & Mitigations
+- **API Dependency**: Single point of failure with GitHub/Spotify APIs
+  - *Mitigation*: Implement fallback recommendations and offline mode
+- **Rate Limiting**: GitHub API limits (5000 requests/hour)
+  - *Mitigation*: Implement exponential backoff and caching
+- **Authentication Complexity**: Multiple OAuth flows
+  - *Mitigation*: Simplify to essential flows, provide clear error messages
+
+### Success Metrics
+- **User Engagement**: Average session duration, playlist creation rate
+- **Technical Performance**: API response times, error rates
+- **Cultural Impact**: Eurovision song diversity in generated playlists
+- **Workshop Success**: Participant completion rates, code comprehension
+
+### Implementation Timeline
+- **Week 1**: Project setup, GitHub API integration, basic UI
+- **Week 2**: AI analysis implementation, Spotify authentication
+- **Week 3**: Playlist creation, error handling, testing
+- **Week 4**: Polish, workshop preparation, documentation
+
+This proposal provides a solid foundation for building GitVision while maintaining focus on the core Eurovision-GitHub connection that makes the app unique.</content>
 <parameter name="filePath">/Users/alacolombiadev/Documents/code/gitvision-workshop/docs/idea.md
