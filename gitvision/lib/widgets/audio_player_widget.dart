@@ -4,6 +4,7 @@ import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
 
 import '../providers/app_state_provider.dart';
 import '../services/theme_provider.dart';
+import '../utils/accessibility_helpers.dart';
 
 class AudioPlayerWidget extends StatelessWidget {
   const AudioPlayerWidget({super.key});
@@ -36,18 +37,25 @@ class AudioPlayerWidget extends StatelessWidget {
           // Progress bar
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-            child: ProgressBar(
-              progress: appState.currentPosition,
-              total: appState.currentDuration,
-              progressBarColor: themeProvider.primaryColor,
-              baseBarColor: themeProvider.primaryColor.withValues(alpha: 0.2),
-              bufferedBarColor: themeProvider.primaryColor.withValues(alpha: 0.4),
-              thumbColor: themeProvider.primaryColor,
-              barHeight: 4.0,
-              thumbRadius: 8.0,
-              onSeek: (duration) {
-                // TODO: Implement seek functionality
-              },
+            child: Semantics(
+              label: AccessibilityConstants.progressBarLabel,
+              slider: true,
+              value: appState.currentPosition.inSeconds.toDouble(),
+              increasedValue: (appState.currentPosition.inSeconds + 10).toDouble(),
+              decreasedValue: (appState.currentPosition.inSeconds - 10).toDouble(),
+              child: ProgressBar(
+                progress: appState.currentPosition,
+                total: appState.currentDuration,
+                progressBarColor: themeProvider.primaryColor,
+                baseBarColor: themeProvider.primaryColor.withValues(alpha: 0.2),
+                bufferedBarColor: themeProvider.primaryColor.withValues(alpha: 0.4),
+                thumbColor: themeProvider.primaryColor,
+                barHeight: 4.0,
+                thumbRadius: 8.0,
+                onSeek: (duration) {
+                  // TODO: Implement seek functionality
+                },
+              ),
             ),
           ),
 
@@ -63,75 +71,86 @@ class AudioPlayerWidget extends StatelessWidget {
 
                 // Song info
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        currentSong['title'] ?? 'Unknown Title',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: themeProvider.textColor,
+                  child: Semantics(
+                    label: 'Currently playing: ${currentSong['title'] ?? 'Unknown Title'} by ${currentSong['artist'] ?? 'Unknown Artist'}',
+                    header: true,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          currentSong['title'] ?? 'Unknown Title',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: themeProvider.textColor,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        '${currentSong['artist'] ?? 'Unknown Artist'} • ${currentSong['country'] ?? 'Unknown'}',
-                        style: TextStyle(
-                          color: themeProvider.textColor.withValues(alpha: 0.7),
-                          fontSize: 12,
+                        Text(
+                          '${currentSong['artist'] ?? 'Unknown Artist'} • ${currentSong['country'] ?? 'Unknown'}',
+                          style: TextStyle(
+                            color: themeProvider.textColor.withValues(alpha: 0.7),
+                            fontSize: 12,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
 
                 // Controls
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Previous button
-                    IconButton(
-                      icon: Icon(Icons.skip_previous),
-                      color: themeProvider.primaryColor,
-                      onPressed: appState.currentlyPlayingIndex! > 0
-                          ? () => _playPrevious(appState)
-                          : null,
-                    ),
-
-                    // Play/Pause button
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
+                Semantics(
+                  label: 'Audio playback controls',
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Previous button
+                      AccessibilityHelpers.accessibleIconButton(
+                        icon: Icons.skip_previous,
+                        onPressed: appState.currentlyPlayingIndex! > 0
+                            ? () => _playPrevious(appState)
+                            : null,
+                        semanticLabel: AccessibilityConstants.previousTrackLabel,
                         color: themeProvider.primaryColor,
                       ),
-                      child: IconButton(
-                        icon: Icon(
-                          appState.isPlaying ? Icons.pause : Icons.play_arrow,
+
+                      // Play/Pause button
+                      Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: themeProvider.primaryColor,
+                        ),
+                        child: AccessibilityHelpers.accessibleIconButton(
+                          icon: appState.isPlaying ? Icons.pause : Icons.play_arrow,
+                          onPressed: () => _togglePlayPause(appState),
+                          semanticLabel: appState.isPlaying 
+                              ? AccessibilityConstants.pauseButtonLabel 
+                              : AccessibilityConstants.playButtonLabel,
                           color: Colors.white,
                         ),
-                        onPressed: () => _togglePlayPause(appState),
                       ),
-                    ),
 
-                    // Next button
-                    IconButton(
-                      icon: Icon(Icons.skip_next),
-                      color: themeProvider.primaryColor,
-                      onPressed: appState.currentlyPlayingIndex! < appState.playlist.length - 1
-                          ? () => _playNext(appState)
-                          : null,
-                    ),
+                      // Next button
+                      AccessibilityHelpers.accessibleIconButton(
+                        icon: Icons.skip_next,
+                        onPressed: appState.currentlyPlayingIndex! < appState.playlist.length - 1
+                            ? () => _playNext(appState)
+                            : null,
+                        semanticLabel: AccessibilityConstants.nextTrackLabel,
+                        color: themeProvider.primaryColor,
+                      ),
 
-                    // Close button
-                    IconButton(
-                      icon: Icon(Icons.close),
-                      color: themeProvider.textColor.withValues(alpha: 0.7),
-                      onPressed: () => appState.stopPlayback(),
-                    ),
-                  ],
+                      // Close button
+                      AccessibilityHelpers.accessibleIconButton(
+                        icon: Icons.close,
+                        onPressed: () => appState.stopPlayback(),
+                        semanticLabel: 'Close audio player',
+                        color: themeProvider.textColor.withValues(alpha: 0.7),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -143,6 +162,8 @@ class AudioPlayerWidget extends StatelessWidget {
 
   Widget _buildAlbumArt(Map<String, dynamic> song, ThemeProvider themeProvider) {
     final imageUrl = song['imageUrl'] as String?;
+    final title = song['title'] as String? ?? 'Unknown Title';
+    final artist = song['artist'] as String? ?? 'Unknown Artist';
     
     return Container(
       width: 48,
@@ -154,19 +175,23 @@ class AudioPlayerWidget extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8),
         child: imageUrl != null && imageUrl.isNotEmpty
-            ? Image.network(
-                imageUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Icon(
+            ? AccessibilityHelpers.accessibleImage(
+                imageUrl: imageUrl,
+                altText: AccessibilityConstants.albumArtLabel(title, artist),
+                width: 48,
+                height: 48,
+                errorWidget: Icon(
                   Icons.music_note,
                   color: themeProvider.primaryColor,
                   size: 24,
+                  semanticLabel: AccessibilityConstants.musicNoteIcon,
                 ),
               )
             : Icon(
                 Icons.music_note,
                 color: themeProvider.primaryColor,
                 size: 24,
+                semanticLabel: AccessibilityConstants.musicNoteIcon,
               ),
       ),
     );

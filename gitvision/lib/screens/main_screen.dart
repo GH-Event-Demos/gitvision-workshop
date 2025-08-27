@@ -7,6 +7,7 @@ import '../widgets/playlist_display_widget.dart';
 import '../widgets/audio_player_widget.dart';
 import '../services/theme_provider.dart';
 import '../widgets/glassmorphic_container.dart';
+import '../utils/accessibility_helpers.dart';
 
 class MainScreen extends StatelessWidget {
   const MainScreen({super.key});
@@ -67,27 +68,34 @@ class MainScreen extends StatelessWidget {
                   color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(
-                  Icons.music_note,
-                  color: Colors.white,
-                  size: 28,
+                child: Semantics(
+                  label: AccessibilityConstants.musicNoteIcon,
+                  child: const Icon(
+                    Icons.music_note,
+                    color: Colors.white,
+                    size: 28,
+                  ),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: ShaderMask(
-                  shaderCallback: (bounds) => LinearGradient(
-                    colors: [
-                      Colors.white,
-                      Colors.white.withOpacity(0.8),
-                    ],
-                  ).createShader(bounds),
-                  child: const Text(
-                    'GitVision',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
+                child: Semantics(
+                  label: AccessibilityConstants.eurovisionAppTitle,
+                  header: true,
+                  child: ShaderMask(
+                    shaderCallback: (bounds) => LinearGradient(
+                      colors: [
+                        Colors.white,
+                        Colors.white.withOpacity(0.8),
+                      ],
+                    ).createShader(bounds),
+                    child: const Text(
+                      'GitVision',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -98,33 +106,36 @@ class MainScreen extends StatelessWidget {
                   color: Colors.white.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(
-                        Icons.palette_outlined,
+                child: Semantics(
+                  label: 'Theme customization controls',
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      AccessibilityHelpers.accessibleIconButton(
+                        icon: Icons.palette_outlined,
+                        onPressed: () => themeProvider.randomizeTheme(),
+                        semanticLabel: 'Randomize Eurovision theme colors',
                         color: Colors.white,
-                        size: 20,
+                        size: AccessibilityConstants.minTouchTargetSize,
+                        tooltip: 'Randomize theme colors',
                       ),
-                      onPressed: () => themeProvider.randomizeTheme(),
-                      tooltip: 'Randomize theme colors',
-                    ),
-                    Container(
-                      width: 1,
-                      height: 24,
-                      color: Colors.white.withValues(alpha: 0.2),
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                      Container(
+                        width: 1,
+                        height: 24,
+                        color: Colors.white.withValues(alpha: 0.2),
+                      ),
+                      AccessibilityHelpers.accessibleIconButton(
+                        icon: themeProvider.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                        onPressed: () => themeProvider.toggleTheme(),
+                        semanticLabel: themeProvider.isDarkMode 
+                            ? 'Switch to light mode' 
+                            : 'Switch to dark mode',
                         color: Colors.white,
-                        size: 20,
+                        size: AccessibilityConstants.minTouchTargetSize,
+                        tooltip: 'Toggle dark/light mode',
                       ),
-                      onPressed: () => themeProvider.toggleTheme(),
-                      tooltip: 'Toggle dark/light mode',
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
