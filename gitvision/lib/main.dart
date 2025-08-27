@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'screens/main_screen.dart';
 import 'config/api_config.dart';
-import 'services/logging_service.dart';
 
 void main() {
   // Initialize Flutter binding

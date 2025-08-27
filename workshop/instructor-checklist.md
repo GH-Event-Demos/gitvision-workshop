@@ -5,7 +5,6 @@
 ### 📚 Workshop Materials
 - [ ] Review [WORKSHOP.md](../WORKSHOP.md) - this is now the main guide
 - [ ] Ensure all steps are clear and work as expected
-- [ ] Have example API tokens ready for demonstration
 - [ ] Prepare example GitHub profiles for testing
 
 ### 📋 Repository Preparation
@@ -28,7 +27,7 @@ Share this repository link: `https://github.com/AndreaGriffiths11/gitvision-andr
 
 **Launch Method**: Codespaces (recommended)
 - Click "Code" → "Codespaces" → "Create codespace on main"
-- Or use direct link: [Launch Codespace](https://codespaces.new/AndreaGriffiths11/gitvision-andrea)
+- Or use direct link: [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/GH-Event-Demos/gitvision-workshop)
 
 ## Workshop Timeline (120 minutes)
 
@@ -104,8 +103,8 @@ Share this repository link: `https://github.com/AndreaGriffiths11/gitvision-andr
 ## Workshop Materials
 
 ### Required Links
-- **Repository**: https://github.com/AndreaGriffiths11/gitvision-andrea
-- **Codespace Launch**: https://codespaces.new/AndreaGriffiths11/gitvision-andrea
+- **Repository**: https:gh.io/gitvision
+- **Codespace Launch**: [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/GH-Event-Demos/gitvision-workshop)
 - **GitHub Tokens**: https://github.com/settings/tokens
 - **Spotify Developer**: https://developer.spotify.com/dashboard
 - **GitHub Models**: https://docs.github.com/github-models
@@ -132,6 +131,5 @@ Share this repository link: `https://github.com/AndreaGriffiths11/gitvision-andr
 - Add music visualization
 - Deploy to production
 
----
 
 **Happy Workshop! May the best Eurovision coding playlist win! 🏆🎵**
